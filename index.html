@@ -210,6 +210,20 @@
       }
       .col-meta:hover { color: var(--text-muted); }
 
+      /* 36h filter pill badge */
+      .filter-pill {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        font-weight: 600;
+        color: var(--orange);
+        border: 1px solid var(--orange);
+        background: transparent;
+        padding: 1px 5px;
+        line-height: 1.2;
+        display: inline-block;
+        margin-left: 4px;
+      }
+
       /* Article list */
       .article-list {
         flex: 1;
@@ -518,6 +532,10 @@
       get rssRefresh() { return (parseInt(localStorage.getItem('rssInterval')) || 15) * 60 * 1000; }
     };
 
+    // Columns that should have the 36-hour age filter applied
+    const FILTERED_COLUMNS = new Set(['news', 'markets']);
+    const FILTER_AGE_MS = 36 * 60 * 60 * 1000; // 36 hours in milliseconds
+
     const BADGE_COLORS = {
       'AP':'#dc2626',
       'WAPO':'#1a1a1a',
@@ -542,7 +560,8 @@
       'JAMA':'#c41230',
       'NEJM EM':'#003087',
       'NEJM NEURO':'#003087',
-      'JWATCH EM':'#003087'
+      'JWATCH EM':'#003087',
+      'ECG WKY':'#b7410e'
     };
 
     const COLUMNS = [
@@ -588,7 +607,8 @@
           { name: 'JAMA', url: 'https://jama.jamanetwork.com/rss/site_3/onlineFirst_67.xml' },
           { name: 'NEJM EM', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=emergency-medicine' },
           { name: 'NEJM NEURO', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=neurology-neurosurgery' },
-          { name: 'JWATCH EM', url: 'https://www.jwatch.org/emergency-medicine/rss' }
+          { name: 'JWATCH EM', url: 'https://www.jwatch.org/emergency-medicine/rss' },
+          { name: 'ECG WKY', url: 'https://ecgweekly.com/feed/' }
         ]
       }
     ];
@@ -635,6 +655,20 @@
 
     function nowTimestamp() {
       return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    /**
+     * Filter articles older than 36 hours. Articles with missing/unparseable
+     * pubDate are kept (included by default).
+     */
+    function filterByAge(articles) {
+      const now = Date.now();
+      return articles.filter(article => {
+        if (!article.pubDate) return true; // keep if no date
+        const parsed = new Date(article.pubDate).getTime();
+        if (isNaN(parsed)) return true; // keep if unparseable
+        return (now - parsed) <= FILTER_AGE_MS;
+      });
     }
 
     // ── CLOCK ──
@@ -815,9 +849,10 @@
       return h;
     }
 
-    function articleListHTML(articles, maxItems) {
+    function articleListHTML(articles, maxItems, emptyMessage) {
       if (!articles || articles.length === 0) {
-        return '<div class="feed-error"><span>No articles found</span></div>';
+        const msg = emptyMessage || 'No articles found';
+        return `<div class="feed-error"><span>${msg}</span></div>`;
       }
       let h = '';
       articles.slice(0, maxItems || 40).forEach(item => {
@@ -865,9 +900,17 @@
       });
 
       merged = sortByDate(merged);
+
+      // Apply 36-hour age filter for News and Markets columns only
+      if (FILTERED_COLUMNS.has(colId)) {
+        merged = filterByAge(merged);
+      }
+
       columnState[colId].mergedArticles = merged;
       columnState[colId].lastFetch = Date.now();
-      listEl.innerHTML = articleListHTML(merged, 40);
+
+      const emptyMsg = FILTERED_COLUMNS.has(colId) ? 'No articles in the past 36 hours' : 'No articles found';
+      listEl.innerHTML = articleListHTML(merged, 40, emptyMsg);
       updateColTimestamp(colId);
     }
 
@@ -896,6 +939,8 @@
         div.className = 'column';
         div.id = `column-${col.id}`;
 
+        const showFilterPill = FILTERED_COLUMNS.has(col.id);
+
         div.innerHTML = `
           <div class="col-header" data-collapse="${col.id}">
             <div class="flex items-center gap-2">
@@ -905,6 +950,7 @@
             <div class="col-meta" data-refresh-col="${col.id}">
               <span>↺</span>
               <span id="col-time-${col.id}" style="font-variant-numeric:tabular-nums;">${nowTimestamp()}</span>
+              ${showFilterPill ? '<span class="filter-pill">36h</span>' : ''}
             </div>
           </div>
           <div class="article-list" id="articles-${col.id}">${skeletonHTML()}</div>
