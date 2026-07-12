@@ -478,7 +478,7 @@
       <div data-id="7" class="flex items-center gap-2">
         <button data-id="8" class="header-btn" id="settings-btn-e5f6">⚙ SETTINGS</button>
         <button data-id="9" class="header-btn" id="refresh-btn-g7h8">↺ REFRESH ALL</button>
-        <span data-id="10" class="version-label">v1.5 · 2026-07-12</span>
+        <span data-id="10" class="version-label">v1.6 · 2026-07-12</span>
       </div>
     </header>
 
@@ -782,7 +782,7 @@
 
       const enc = encodeURIComponent(url);
       const races = [
-        attempt(`https://corsproxy.io/?${enc}`),
+        attempt(`https://corsproxy.io/?url=${enc}`),
         attempt(`https://api.allorigins.win/raw?url=${enc}`),
         attempt(`https://api.codetabs.com/v1/proxy?quest=${enc}`)
       ];
