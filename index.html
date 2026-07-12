@@ -431,6 +431,16 @@
       }
       .btn-cancel:hover { background: #e5e7eb; }
 
+      /* Version label */
+      .version-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        color: #c0c4cc;
+        margin-left: 10px;
+        white-space: nowrap;
+        user-select: none;
+      }
+
       /* Mobile responsive */
       @media (max-width: 767px) {
         .header-clock { display: none !important; }
@@ -448,6 +458,7 @@
         .col-header { cursor: pointer; }
         .col-header .collapse-icon { display: inline-block; }
         .article-list { max-height: 400px; }
+        .version-label { display: none; }
       }
       @media (min-width: 768px) {
         .col-header .collapse-icon { display: none; }
@@ -467,48 +478,49 @@
       <div data-id="7" class="flex items-center gap-2">
         <button data-id="8" class="header-btn" id="settings-btn-e5f6">⚙ SETTINGS</button>
         <button data-id="9" class="header-btn" id="refresh-btn-g7h8">↺ REFRESH ALL</button>
+        <span data-id="10" class="version-label">v1.4 · 2026-07-12</span>
       </div>
     </header>
 
     <!-- MARKET SECTION -->
-    <div data-id="10" class="market-section" id="market-section-w2x3">
-      <div data-id="11" class="market-header">
-        <div data-id="12" class="market-label">
-          <span data-id="13" class="pulse-dot"></span>
-          <span data-id="14">MARKETS</span>
+    <div data-id="11" class="market-section" id="market-section-w2x3">
+      <div data-id="12" class="market-header">
+        <div data-id="13" class="market-label">
+          <span data-id="14" class="pulse-dot"></span>
+          <span data-id="15">MARKETS</span>
         </div>
-        <div data-id="15" class="market-time" id="market-time-i4j5">Updated --:--</div>
+        <div data-id="16" class="market-time" id="market-time-i4j5">Updated --:--</div>
       </div>
-      <div data-id="16" class="market-grid" id="market-grid-m8n9"></div>
+      <div data-id="17" class="market-grid" id="market-grid-m8n9"></div>
     </div>
 
     <!-- MAIN COLUMNS -->
-    <div data-id="17" class="columns-container" id="columns-container-c4d5"></div>
+    <div data-id="18" class="columns-container" id="columns-container-c4d5"></div>
 
     <!-- SETTINGS MODAL -->
-    <div data-id="18" class="modal-overlay" id="settings-modal-g8h9">
-      <div data-id="19" class="modal-panel">
-        <div data-id="20" class="modal-title">Dashboard Settings</div>
-        <div data-id="21" class="modal-field">
-          <label data-id="22" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
-          <select data-id="23" class="modal-select" id="select-rss-i6j7">
-            <option data-id="24" value="5">5 minutes</option>
-            <option data-id="25" value="10">10 minutes</option>
-            <option data-id="26" value="15" selected>15 minutes</option>
-            <option data-id="27" value="30">30 minutes</option>
+    <div data-id="19" class="modal-overlay" id="settings-modal-g8h9">
+      <div data-id="20" class="modal-panel">
+        <div data-id="21" class="modal-title">Dashboard Settings</div>
+        <div data-id="22" class="modal-field">
+          <label data-id="23" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
+          <select data-id="24" class="modal-select" id="select-rss-i6j7">
+            <option data-id="25" value="5">5 minutes</option>
+            <option data-id="26" value="10">10 minutes</option>
+            <option data-id="27" value="15" selected>15 minutes</option>
+            <option data-id="28" value="30">30 minutes</option>
           </select>
         </div>
-        <div data-id="28" class="modal-field">
-          <label data-id="29" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
-          <select data-id="30" class="modal-select" id="select-mkt-q4r5">
-            <option data-id="31" value="1">1 minute</option>
-            <option data-id="32" value="2" selected>2 minutes</option>
-            <option data-id="33" value="5">5 minutes</option>
+        <div data-id="29" class="modal-field">
+          <label data-id="30" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
+          <select data-id="31" class="modal-select" id="select-mkt-q4r5">
+            <option data-id="32" value="1">1 minute</option>
+            <option data-id="33" value="2" selected>2 minutes</option>
+            <option data-id="34" value="5">5 minutes</option>
           </select>
         </div>
-        <div data-id="34" class="modal-actions">
-          <button data-id="35" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
-          <button data-id="36" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
+        <div data-id="35" class="modal-actions">
+          <button data-id="36" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
+          <button data-id="37" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
         </div>
       </div>
     </div>
@@ -749,65 +761,57 @@
       }
     }
 
-    // ── RSS FEEDS — Multi-proxy fetch with client-side XML parsing ──
+    // ── RSS FEEDS — Parallel multi-proxy fetch with client-side XML parsing ──
 
     /**
-     * Fetches an RSS/Atom feed via multiple CORS proxies with automatic
-     * failover. Parses the XML client-side with DOMParser.
+     * Fetches an RSS/Atom feed via multiple CORS proxies fired simultaneously
+     * using Promise.any(). Each proxy has an 8-second timeout via
+     * AbortSignal.timeout(). The first successful response wins.
      * Returns an array of { title, link, pubDate, description }.
      */
     async function fetchFeed(url) {
-      const proxies = [
-        () => fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&timestamp=${Date.now()}`)
-              .then(r => r.ok ? r.json().then(d => d.contents) : Promise.reject()),
-        () => fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`)
-              .then(r => r.ok ? r.text() : Promise.reject()),
-        () => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`)
-              .then(r => r.ok ? r.text() : Promise.reject()),
+      // Build one fetch attempt per proxy, all fired at once
+      function attempt(proxyUrl) {
+        return fetch(proxyUrl, { signal: AbortSignal.timeout(8000) })
+          .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+          .then(text => {
+            if (!text || text.trim().length < 50) throw new Error('empty');
+            return text;
+          });
+      }
+
+      const enc = encodeURIComponent(url);
+      const races = [
+        attempt(`https://corsproxy.io/?${enc}`),
+        attempt(`https://api.allorigins.win/raw?url=${enc}`),
+        attempt(`https://api.codetabs.com/v1/proxy?quest=${enc}`),
+        attempt(`https://thingproxy.freeboard.io/fetch/${url}`),
       ];
 
-      let xmlText = null;
-      for (const tryProxy of proxies) {
-        try {
-          xmlText = await tryProxy();
-          if (xmlText && xmlText.trim().length > 50) break;
-          xmlText = null;
-        } catch (e) { continue; }
+      let xmlText;
+      try {
+        xmlText = await Promise.any(races);
+      } catch (e) {
+        return [];
       }
-      if (!xmlText) return [];
 
       try {
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, 'text/xml');
-
-        // Support both RSS <item> and Atom <entry>
         const items = Array.from(xml.querySelectorAll('item, entry'));
-
         return items.slice(0, 25).map(item => {
-          // Title
           const title = item.querySelector('title')?.textContent?.trim() || 'Untitled';
-
-          // Link — RSS uses <link>, Atom uses <link href="..."> or <link> text
           let link = '';
           const linkEl = item.querySelector('link');
-          if (linkEl) {
-            link = linkEl.getAttribute('href') || linkEl.textContent?.trim() || '';
-          }
-
-          // Publication date
+          if (linkEl) link = linkEl.getAttribute('href') || linkEl.textContent?.trim() || '';
           const pubDate =
             item.querySelector('pubDate')?.textContent?.trim() ||
             item.querySelector('published')?.textContent?.trim() ||
-            item.querySelector('updated')?.textContent?.trim() ||
-            '';
-
-          // Description / summary
+            item.querySelector('updated')?.textContent?.trim() || '';
           const description =
             item.querySelector('description')?.textContent?.trim() ||
             item.querySelector('summary')?.textContent?.trim() ||
-            item.querySelector('content')?.textContent?.trim() ||
-            '';
-
+            item.querySelector('content')?.textContent?.trim() || '';
           return { title, link, pubDate, description };
         });
       } catch (e) {
