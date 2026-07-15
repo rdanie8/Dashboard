@@ -167,6 +167,45 @@
       .tile-up { color: var(--gain); }
       .tile-down { color: var(--loss); }
 
+      /* Quick Links Bar */
+      .quick-links-bar {
+        height: 34px;
+        background: #ffffff;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 14px;
+        position: fixed;
+        left: 0; right: 0;
+        z-index: 98;
+      }
+      .quick-links-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--orange);
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+      }
+      .quick-link-btn {
+        background: #f5f5f5;
+        border: 1px solid #d1d5db;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        color: #374151;
+        padding: 3px 12px;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        white-space: nowrap;
+      }
+      .quick-link-btn:hover { background: #e5e7eb; color: #111827; }
+
       /* Columns */
       .columns-container {
         position: fixed;
@@ -431,16 +470,6 @@
       }
       .btn-cancel:hover { background: #e5e7eb; }
 
-      /* Version label */
-      .version-label {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 9px;
-        color: #c0c4cc;
-        margin-left: 10px;
-        white-space: nowrap;
-        user-select: none;
-      }
-
       /* Mobile responsive */
       @media (max-width: 767px) {
         .header-clock { display: none !important; }
@@ -458,7 +487,6 @@
         .col-header { cursor: pointer; }
         .col-header .collapse-icon { display: inline-block; }
         .article-list { max-height: 400px; }
-        .version-label { display: none; }
       }
       @media (min-width: 768px) {
         .col-header .collapse-icon { display: none; }
@@ -478,49 +506,55 @@
       <div data-id="7" class="flex items-center gap-2">
         <button data-id="8" class="header-btn" id="settings-btn-e5f6">⚙ SETTINGS</button>
         <button data-id="9" class="header-btn" id="refresh-btn-g7h8">↺ REFRESH ALL</button>
-        <span data-id="10" class="version-label">v1.6 · 2026-07-12</span>
       </div>
     </header>
 
     <!-- MARKET SECTION -->
-    <div data-id="11" class="market-section" id="market-section-w2x3">
-      <div data-id="12" class="market-header">
-        <div data-id="13" class="market-label">
-          <span data-id="14" class="pulse-dot"></span>
-          <span data-id="15">MARKETS</span>
+    <div data-id="10" class="market-section" id="market-section-w2x3">
+      <div data-id="11" class="market-header">
+        <div data-id="12" class="market-label">
+          <span data-id="13" class="pulse-dot"></span>
+          <span data-id="14">MARKETS</span>
         </div>
-        <div data-id="16" class="market-time" id="market-time-i4j5">Updated --:--</div>
+        <div data-id="15" class="market-time" id="market-time-i4j5">Updated --:--</div>
       </div>
-      <div data-id="17" class="market-grid" id="market-grid-m8n9"></div>
+      <div data-id="16" class="market-grid" id="market-grid-m8n9"></div>
+    </div>
+
+    <!-- QUICK LINKS BAR -->
+    <div data-id="17" class="quick-links-bar" id="quick-links-bar-q1r2">
+      <span data-id="18" class="quick-links-label">🔗 QUICK LINKS</span>
+      <a data-id="19" class="quick-link-btn" href="https://www.emrap.org" target="_blank" rel="noopener noreferrer">EMRAP</a>
+      <a data-id="20" class="quick-link-btn" href="https://www.ecgweekly.com" target="_blank" rel="noopener noreferrer">ECG WEEKLY</a>
     </div>
 
     <!-- MAIN COLUMNS -->
-    <div data-id="18" class="columns-container" id="columns-container-c4d5"></div>
+    <div data-id="21" class="columns-container" id="columns-container-c4d5"></div>
 
     <!-- SETTINGS MODAL -->
-    <div data-id="19" class="modal-overlay" id="settings-modal-g8h9">
-      <div data-id="20" class="modal-panel">
-        <div data-id="21" class="modal-title">Dashboard Settings</div>
-        <div data-id="22" class="modal-field">
-          <label data-id="23" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
-          <select data-id="24" class="modal-select" id="select-rss-i6j7">
-            <option data-id="25" value="5">5 minutes</option>
-            <option data-id="26" value="10">10 minutes</option>
-            <option data-id="27" value="15" selected>15 minutes</option>
-            <option data-id="28" value="30">30 minutes</option>
+    <div data-id="22" class="modal-overlay" id="settings-modal-g8h9">
+      <div data-id="23" class="modal-panel">
+        <div data-id="24" class="modal-title">Dashboard Settings</div>
+        <div data-id="25" class="modal-field">
+          <label data-id="26" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
+          <select data-id="27" class="modal-select" id="select-rss-i6j7">
+            <option data-id="28" value="5">5 minutes</option>
+            <option data-id="29" value="10">10 minutes</option>
+            <option data-id="30" value="15" selected>15 minutes</option>
+            <option data-id="31" value="30">30 minutes</option>
           </select>
         </div>
-        <div data-id="29" class="modal-field">
-          <label data-id="30" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
-          <select data-id="31" class="modal-select" id="select-mkt-q4r5">
-            <option data-id="32" value="1">1 minute</option>
-            <option data-id="33" value="2" selected>2 minutes</option>
-            <option data-id="34" value="5">5 minutes</option>
+        <div data-id="32" class="modal-field">
+          <label data-id="33" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
+          <select data-id="34" class="modal-select" id="select-mkt-q4r5">
+            <option data-id="35" value="1">1 minute</option>
+            <option data-id="36" value="2" selected>2 minutes</option>
+            <option data-id="37" value="5">5 minutes</option>
           </select>
         </div>
-        <div data-id="35" class="modal-actions">
-          <button data-id="36" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
-          <button data-id="37" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
+        <div data-id="38" class="modal-actions">
+          <button data-id="39" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
+          <button data-id="40" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
         </div>
       </div>
     </div>
@@ -538,6 +572,7 @@
         '^TNX':'10Y YIELD', 'BTC-USD':'BITCOIN', 'ETH-USD':'ETHEREUM',
         'GC=F':'GOLD', 'CL=F':'CRUDE OIL', 'EURUSD=X':'EUR/USD'
       },
+      rssProxy: 'https://api.rss2json.com/v1/api.json?rss_url=',
       corsProxy: 'https://corsproxy.io/?url=',
       get mktRefresh() { return (parseInt(localStorage.getItem('mktInterval')) || 2) * 60 * 1000; },
       get rssRefresh() { return (parseInt(localStorage.getItem('rssInterval')) || 15) * 60 * 1000; }
@@ -564,6 +599,7 @@
       'arXiv AI':'#b45309',
       'MIT AI':'#d72638',
       'MIT NEWS':'#d72638',
+      '3B1B':'#1565c0',
       'BMJ OPEN':'#005eb8',
       'JWATCH GM':'#003087',
       'EMRAP':'#cc0000',
@@ -571,8 +607,7 @@
       'JAMA':'#c41230',
       'NEJM EM':'#003087',
       'NEJM NEURO':'#003087',
-      'JWATCH EM':'#003087',
-      'ECG WKY':'#b7410e'
+      'JWATCH EM':'#003087'
     };
 
     const COLUMNS = [
@@ -605,7 +640,8 @@
           { name: 'arXiv CV', url: 'https://arxiv.org/rss/cs.CV' },
           { name: 'arXiv AI', url: 'https://arxiv.org/rss/cs.AI' },
           { name: 'MIT AI', url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed' },
-          { name: 'MIT NEWS', url: 'https://www.technologyreview.com/topnews.rss' }
+          { name: 'MIT NEWS', url: 'https://www.technologyreview.com/topnews.rss' },
+          { name: '3B1B', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCoxcjq-8xIDTYp3uz647V5A' }
         ]
       },
       {
@@ -618,8 +654,7 @@
           { name: 'JAMA', url: 'https://jama.jamanetwork.com/rss/site_3/onlineFirst_67.xml' },
           { name: 'NEJM EM', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=emergency-medicine' },
           { name: 'NEJM NEURO', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=neurology-neurosurgery' },
-          { name: 'JWATCH EM', url: 'https://www.jwatch.org/emergency-medicine/rss' },
-          { name: 'ECG WKY', url: 'https://ecgweekly.com/feed/' }
+          { name: 'JWATCH EM', url: 'https://www.jwatch.org/emergency-medicine/rss' }
         ]
       }
     ];
@@ -761,60 +796,93 @@
       }
     }
 
-    // ── RSS FEEDS — Parallel multi-proxy fetch with client-side XML parsing ──
+    // ── RSS FEEDS — Two-tier fetch with Atom support ──
+    function normalizeRss2jsonItem(item, sourceName) {
+      return {
+        title: item.title || '',
+        link: item.link || '',
+        pubDate: item.pubDate || '',
+        description: item.description || '',
+        source: sourceName
+      };
+    }
 
-    /**
-     * Fetches an RSS/Atom feed via multiple CORS proxies fired simultaneously
-     * using Promise.any(). Each proxy has an 8-second timeout via
-     * AbortSignal.timeout(). The first successful response wins.
-     * Returns an array of { title, link, pubDate, description }.
-     */
-    async function fetchFeed(url) {
-      // Build one fetch attempt per proxy, all fired at once
-      function attempt(proxyUrl) {
-        return fetch(proxyUrl, { signal: AbortSignal.timeout(8000) })
-          .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
-          .then(text => {
-            if (!text || text.trim().length < 50) throw new Error('empty');
-            return text;
-          });
+    function parseXMLItems(xmlText, sourceName) {
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, 'text/xml');
+
+      // Try RSS <item> elements first
+      const rssItems = [...xml.querySelectorAll('item')];
+      if (rssItems.length > 0) {
+        return rssItems.map(item => ({
+          title: item.querySelector('title')?.textContent || '',
+          link: item.querySelector('link')?.textContent || '',
+          pubDate: item.querySelector('pubDate')?.textContent || '',
+          description: item.querySelector('description')?.textContent || '',
+          source: sourceName
+        }));
       }
 
-      const enc = encodeURIComponent(url);
-      const races = [
-        attempt(`https://corsproxy.io/?url=${enc}`),
-        attempt(`https://api.allorigins.win/raw?url=${enc}`),
-        attempt(`https://api.codetabs.com/v1/proxy?quest=${enc}`)
-      ];
-
-      let xmlText;
-      try {
-        xmlText = await Promise.any(races);
-      } catch (e) {
-        return [];
-      }
-
-      try {
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlText, 'text/xml');
-        const items = Array.from(xml.querySelectorAll('item, entry'));
-        return items.slice(0, 25).map(item => {
-          const title = item.querySelector('title')?.textContent?.trim() || 'Untitled';
+      // Fallback: Atom <entry> elements (e.g. YouTube feeds)
+      const atomEntries = [...xml.querySelectorAll('entry')];
+      if (atomEntries.length > 0) {
+        return atomEntries.map(entry => {
+          const title = entry.querySelector('title')?.textContent || '';
           let link = '';
-          const linkEl = item.querySelector('link');
-          if (linkEl) link = linkEl.getAttribute('href') || linkEl.textContent?.trim() || '';
-          const pubDate =
-            item.querySelector('pubDate')?.textContent?.trim() ||
-            item.querySelector('published')?.textContent?.trim() ||
-            item.querySelector('updated')?.textContent?.trim() || '';
-          const description =
-            item.querySelector('description')?.textContent?.trim() ||
-            item.querySelector('summary')?.textContent?.trim() ||
-            item.querySelector('content')?.textContent?.trim() || '';
-          return { title, link, pubDate, description };
+          const altLink = entry.querySelector('link[rel="alternate"]');
+          if (altLink) {
+            link = altLink.getAttribute('href') || '';
+          } else {
+            const anyLink = entry.querySelector('link');
+            if (anyLink) {
+              link = anyLink.getAttribute('href') || anyLink.textContent || '';
+            }
+          }
+          if (!link) {
+            link = entry.querySelector('id')?.textContent || '';
+          }
+          const pubDate = entry.querySelector('published')?.textContent ||
+                          entry.querySelector('updated')?.textContent || '';
+          const mediaDesc = entry.getElementsByTagNameNS('http://search.yahoo.com/mrss/', 'description');
+          let description = '';
+          if (mediaDesc.length > 0) {
+            description = mediaDesc[0].textContent || '';
+          } else {
+            description = entry.querySelector('content')?.textContent ||
+                          entry.querySelector('summary')?.textContent || '';
+          }
+          return { title, link, pubDate, description, source: sourceName };
         });
-      } catch (e) {
-        return [];
+      }
+
+      return [];
+    }
+
+    async function fetchSingleFeed(feedUrl, sourceName) {
+      // Tier 1: rss2json
+      try {
+        const url1 = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25`;
+        const res = await fetch(url1);
+        if (!res.ok) throw new Error('rss2json HTTP ' + res.status);
+        const data = await res.json();
+        if (data.status === 'ok' && data.items?.length) {
+          return data.items.map(i => normalizeRss2jsonItem(i, sourceName));
+        }
+        throw new Error('rss2json no items');
+      } catch (e1) {
+        // Tier 2: corsproxy + DOMParser
+        try {
+          const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(feedUrl)}`;
+          const res = await fetch(proxyUrl);
+          if (!res.ok) throw new Error('corsproxy HTTP ' + res.status);
+          const text = await res.text();
+          const items = parseXMLItems(text, sourceName);
+          if (items.length > 0) return items;
+          throw new Error('XML parse returned 0 items');
+        } catch (e2) {
+          console.warn(`Both tiers failed for ${sourceName}:`, e1.message, e2.message);
+          return [];
+        }
       }
     }
 
@@ -868,11 +936,7 @@
       listEl.innerHTML = skeletonHTML();
       let merged = [];
 
-      const promises = col.feeds.map(feed =>
-        fetchFeed(feed.url).then(items =>
-          items.map(item => ({ ...item, source: feed.name }))
-        )
-      );
+      const promises = col.feeds.map(feed => fetchSingleFeed(feed.url, feed.name));
       const results = await Promise.allSettled(promises);
 
       results.forEach(result => {
@@ -904,12 +968,19 @@
     // ── LAYOUT CALCULATION ──
     function calculateLayout() {
       const marketSection = document.getElementById('market-section-w2x3');
+      const quickLinksBar = document.getElementById('quick-links-bar-q1r2');
       const cols = document.getElementById('columns-container-c4d5');
 
       const headerH = 40;
       const marketH = marketSection ? marketSection.offsetHeight : 0;
+      const quickLinksH = quickLinksBar ? quickLinksBar.offsetHeight : 0;
 
-      cols.style.top = (headerH + marketH) + 'px';
+      // Position the quick links bar below the market section
+      if (quickLinksBar) {
+        quickLinksBar.style.top = (headerH + marketH) + 'px';
+      }
+
+      cols.style.top = (headerH + marketH + quickLinksH) + 'px';
     }
 
     // ── RENDER COLUMNS ──
