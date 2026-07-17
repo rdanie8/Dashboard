@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Bloomberg Ultra Dashboard v2.5 -->
+<!-- Bloomberg Ultra Dashboard v2.6 -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -527,7 +527,7 @@
       <div data-id="7" class="flex items-center gap-2">
         <button data-id="8" class="header-btn" id="settings-btn-e5f6">⚙ SETTINGS</button>
         <button data-id="9" class="header-btn" id="refresh-btn-g7h8">↺ REFRESH ALL</button>
-        <span data-id="10" class="font-mono-data" style="font-size:10px; color:#9ca3af;">v2.5</span>
+        <span data-id="10" class="font-mono-data" style="font-size:10px; color:#9ca3af;">v2.6</span>
       </div>
     </header>
 
@@ -711,12 +711,13 @@
       const hours = Math.floor(diff / 3600000);
       const days = Math.floor(diff / 86400000);
 
-      if (mins < 0) return 'just now'; // future date guard
-      if (mins < 2) return 'just now';
+      // Never show "just now" — always show a real time value
+      // This prevents rss2json date-substitution bug from showing stale items as fresh
+      if (mins < 1) return '< 1m ago';
       if (mins < 60) return `${mins}m ago`;
       if (hours < 24) return `${hours}h ago`;
+      if (days === 1) return '1d ago';
       if (days < 7) return `${days}d ago`;
-      // For older articles, show actual date
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: days > 365 ? 'numeric' : undefined });
     }
 
@@ -930,9 +931,10 @@
       return [];
     }
 
-    // ── rss2json FAST FETCH (for News/Markets/AI columns) ──
-    async function fetchSingleFeedFast(feedUrl, sourceName) {
-      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25`;
+    // ── rss2json FAST FETCH (for all columns) ──
+    async function fetchSingleFeedFast(feedUrl, sourceName, bypassCache = false) {
+      const cacheSuffix = bypassCache ? '&cache_time=0' : '';
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25${cacheSuffix}`;
       try {
         const res = await fetch(apiUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error('rss2json failed');
@@ -1001,11 +1003,11 @@
       listEl.innerHTML = skeletonHTML();
       let merged = [];
 
-      // Medical Education uses direct XML (freshness critical); all others use rss2json (fast)
-      const useFast = colId !== 'medical';
-      const fetchFn = useFast ? fetchSingleFeedFast : fetchSingleFeed;
+      // ALL columns use rss2json — direct XML proxies time out on Cloudflare-protected feeds (JAMA, NEJM)
+      const fetchFn = fetchSingleFeedFast;
 
-      const promises = col.feeds.map(feed => fetchFn(feed.url, feed.name));
+      const bypassCache = colId === 'medical';
+      const promises = col.feeds.map(feed => fetchFn(feed.url, feed.name, bypassCache));
       const results = await Promise.allSettled(promises);
 
       results.forEach(result => {
