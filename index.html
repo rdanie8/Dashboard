@@ -600,7 +600,6 @@
 
     // ── RSS CONFIG ──
     const CONFIG = {
-      rssProxy: 'https://api.rss2json.com/v1/api.json?rss_url=',
       corsProxy: 'https://corsproxy.io/?url=',
       get rssRefresh() { return (parseInt(localStorage.getItem('rssInterval')) || 15) * 60 * 1000; }
     };
@@ -702,17 +701,21 @@
 
     function timeAgo(dateStr) {
       if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return '';
       const now = Date.now();
-      const past = new Date(dateStr).getTime();
-      if (isNaN(past)) return '';
-      const delta = Math.max(0, now - past);
-      const mins = Math.floor(delta / 60000);
+      const diff = now - date.getTime();
+      const mins = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+
+      if (mins < 0) return 'just now'; // future date guard
       if (mins < 2) return 'just now';
-      if (mins < 60) return mins + 'm ago';
-      const hrs = Math.floor(mins / 60);
-      if (hrs < 24) return hrs + 'h ago';
-      const days = Math.floor(hrs / 24);
-      return days + 'd ago';
+      if (mins < 60) return `${mins}m ago`;
+      if (hours < 24) return `${hours}h ago`;
+      if (days < 7) return `${days}d ago`;
+      // For older articles, show actual date
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: days > 365 ? 'numeric' : undefined });
     }
 
     function isRecent(dateStr) {
@@ -831,16 +834,7 @@
       }
     }
 
-    // ── RSS FEEDS — Two-tier fetch with Atom support ──
-    function normalizeRss2jsonItem(item, sourceName) {
-      return {
-        title: item.title || '',
-        link: item.link || '',
-        pubDate: item.pubDate || '',
-        description: item.description || '',
-        source: sourceName
-      };
-    }
+    // ── RSS FEEDS — Direct XML fetch with multi-proxy fallback ──
 
     function parseXMLItems(xmlText, sourceName) {
       const parser = new DOMParser();
@@ -848,13 +842,20 @@
 
       const rssItems = [...xml.querySelectorAll('item')];
       if (rssItems.length > 0) {
-        return rssItems.map(item => ({
-          title: item.querySelector('title')?.textContent || '',
-          link: item.querySelector('link')?.textContent || '',
-          pubDate: item.querySelector('pubDate')?.textContent || '',
-          description: item.querySelector('description')?.textContent || '',
-          source: sourceName
-        }));
+        return rssItems.map(item => {
+          const pubDate = item.querySelector('pubDate')?.textContent?.trim() ||
+                          item.querySelector('published')?.textContent?.trim() ||
+                          item.querySelector('updated')?.textContent?.trim() ||
+                          item.querySelector('dc\\:date, date')?.textContent?.trim() ||
+                          '';
+          return {
+            title: item.querySelector('title')?.textContent || '',
+            link: item.querySelector('link')?.textContent || '',
+            pubDate: pubDate,
+            description: item.querySelector('description')?.textContent || '',
+            source: sourceName
+          };
+        });
       }
 
       const atomEntries = [...xml.querySelectorAll('entry')];
@@ -874,8 +875,10 @@
           if (!link) {
             link = entry.querySelector('id')?.textContent || '';
           }
-          const pubDate = entry.querySelector('published')?.textContent ||
-                          entry.querySelector('updated')?.textContent || '';
+          const pubDate = entry.querySelector('published')?.textContent?.trim() ||
+                          entry.querySelector('updated')?.textContent?.trim() ||
+                          entry.querySelector('pubDate')?.textContent?.trim() ||
+                          '';
           const mediaDesc = entry.getElementsByTagNameNS('http://search.yahoo.com/mrss/', 'description');
           let description = '';
           if (mediaDesc.length > 0) {
@@ -892,29 +895,35 @@
     }
 
     async function fetchSingleFeed(feedUrl, sourceName) {
-      try {
-        const url1 = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25`;
-        const res = await fetch(url1);
-        if (!res.ok) throw new Error('rss2json HTTP ' + res.status);
-        const data = await res.json();
-        if (data.status === 'ok' && data.items?.length) {
-          return data.items.map(i => normalizeRss2jsonItem(i, sourceName));
-        }
-        throw new Error('rss2json no items');
-      } catch (e1) {
+      const bust = '&_cb=' + Date.now(); // cache-buster
+      const proxies = [
+        `https://corsproxy.io/?url=${encodeURIComponent(feedUrl + (feedUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now())}`,
+        `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}${bust}`
+      ];
+
+      for (const proxyUrl of proxies) {
         try {
-          const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(feedUrl)}`;
-          const res = await fetch(proxyUrl);
-          if (!res.ok) throw new Error('corsproxy HTTP ' + res.status);
+          const res = await fetch(proxyUrl, { cache: 'no-store' });
+          if (!res.ok) continue;
           const text = await res.text();
-          const items = parseXMLItems(text, sourceName);
-          if (items.length > 0) return items;
-          throw new Error('XML parse returned 0 items');
-        } catch (e2) {
-          console.warn(`Both tiers failed for ${sourceName}:`, e1.message, e2.message);
-          return [];
+          // allorigins wraps in { contents: "..." }
+          let xmlText = text;
+          try {
+            const outer = JSON.parse(text);
+            if (outer.contents) xmlText = outer.contents;
+          } catch { /* raw XML, use as-is */ }
+
+          const items = parseXMLItems(xmlText, sourceName);
+          if (items.length > 0) {
+            console.log(`✓ ${sourceName}: ${items.length} items via ${proxyUrl.includes('allorigins') ? 'allorigins' : 'corsproxy'}`);
+            return items;
+          }
+        } catch (e) {
+          console.warn(`Proxy failed for ${sourceName}:`, e.message);
         }
       }
+      console.warn(`All proxies failed for ${sourceName}`);
+      return [];
     }
 
     // ── RENDERING ──
