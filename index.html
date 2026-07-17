@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Bloomberg Ultra Dashboard v2.5 -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -526,55 +527,56 @@
       <div data-id="7" class="flex items-center gap-2">
         <button data-id="8" class="header-btn" id="settings-btn-e5f6">⚙ SETTINGS</button>
         <button data-id="9" class="header-btn" id="refresh-btn-g7h8">↺ REFRESH ALL</button>
+        <span data-id="10" class="font-mono-data" style="font-size:10px; color:#9ca3af;">v2.5</span>
       </div>
     </header>
 
     <!-- MARKET SECTION -->
-    <div data-id="10" class="market-section" id="market-section-w2x3">
-      <div data-id="11" class="market-header">
-        <div data-id="12" class="market-label">
-          <span data-id="13" class="pulse-dot"></span>
-          <span data-id="14">MARKETS</span>
+    <div data-id="11" class="market-section" id="market-section-w2x3">
+      <div data-id="12" class="market-header">
+        <div data-id="13" class="market-label">
+          <span data-id="14" class="pulse-dot"></span>
+          <span data-id="15">MARKETS</span>
         </div>
-        <span data-id="15" class="market-time" id="market-updated">Updated --:--</span>
+        <span data-id="16" class="market-time" id="market-updated">Updated --:--</span>
       </div>
-      <div data-id="16" id="market-tiles"></div>
+      <div data-id="17" id="market-tiles"></div>
     </div>
 
     <!-- QUICK LINKS BAR -->
-    <div data-id="17" class="quick-links-bar" id="quick-links-bar-q1r2">
-      <span data-id="18" class="quick-links-label">🔗 QUICK LINKS</span>
-      <a data-id="19" class="quick-link-btn" href="https://www.emrap.org" target="_blank" rel="noopener noreferrer">EMRAP</a>
-      <a data-id="20" class="quick-link-btn" href="https://www.ecgweekly.com" target="_blank" rel="noopener noreferrer">ECG WEEKLY</a>
+    <div data-id="18" class="quick-links-bar" id="quick-links-bar-q1r2">
+      <span data-id="19" class="quick-links-label">🔗 QUICK LINKS</span>
+      <a data-id="20" class="quick-link-btn" href="https://www.emrap.org" target="_blank" rel="noopener noreferrer">EMRAP</a>
+      <a data-id="21" class="quick-link-btn" href="https://www.ecgweekly.com" target="_blank" rel="noopener noreferrer">ECG WEEKLY</a>
     </div>
 
     <!-- MAIN COLUMNS -->
-    <div data-id="21" class="columns-container" id="columns-container-c4d5"></div>
+    <div data-id="22" class="columns-container" id="columns-container-c4d5"></div>
 
     <!-- SETTINGS MODAL -->
-    <div data-id="22" class="modal-overlay" id="settings-modal-g8h9">
-      <div data-id="23" class="modal-panel">
-        <div data-id="24" class="modal-title">Dashboard Settings</div>
-        <div data-id="25" class="modal-field">
-          <label data-id="26" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
-          <select data-id="27" class="modal-select" id="select-rss-i6j7">
-            <option data-id="28" value="5">5 minutes</option>
-            <option data-id="29" value="10">10 minutes</option>
-            <option data-id="30" value="15" selected>15 minutes</option>
-            <option data-id="31" value="30">30 minutes</option>
+    <div data-id="23" class="modal-overlay" id="settings-modal-g8h9">
+      <div data-id="24" class="modal-panel">
+        <div data-id="25" class="modal-title">Dashboard Settings</div>
+        <div data-id="26" class="modal-field">
+          <label data-id="27" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
+          <select data-id="28" class="modal-select" id="select-rss-i6j7">
+            <option data-id="29" value="5">5 minutes</option>
+            <option data-id="30" value="10">10 minutes</option>
+            <option data-id="31" value="15" selected>15 minutes</option>
+            <option data-id="32" value="30">30 minutes</option>
           </select>
         </div>
-        <div data-id="32" class="modal-field">
-          <label data-id="33" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
-          <select data-id="34" class="modal-select" id="select-mkt-q4r5">
-            <option data-id="35" value="1">1 minute</option>
-            <option data-id="36" value="2" selected>2 minutes</option>
-            <option data-id="37" value="5">5 minutes</option>
+        <div data-id="33" class="modal-field">
+          <label data-id="34" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
+          <select data-id="35" class="modal-select" id="select-mkt-q4r5">
+            <option data-id="36" value="1">1 minute</option>
+            <option data-id="37" value="2" selected>2 minutes</option>
+            <option data-id="38" value="5">5 minutes</option>
           </select>
         </div>
-        <div data-id="38" class="modal-actions">
-          <button data-id="39" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
-          <button data-id="40" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
+        <div data-id="39" class="modal-actions">
+          <button data-id="40" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
+          <button data-id="41" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
         </div>
       </div>
     </div>
@@ -754,65 +756,67 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // ── MARKET DATA (multi-proxy fallback) ──
+    // ── MARKET DATA (Yahoo Finance chart API — per-symbol, parallel) ──
     async function fetchMarketData() {
-      const syms = MARKET_SYMBOLS.map(s => s.sym).join(',');
-      const apiUrl = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${encodeURIComponent(syms)}&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent`;
-
-      const attempts = [
-        () => fetch(`https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`, { cache: 'no-store' }),
-        () => fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`, { cache: 'no-store' }),
-        () => fetch(`https://thingproxy.freeboard.io/fetch/${apiUrl}`, { cache: 'no-store' })
-      ];
-
-      for (const attempt of attempts) {
-        try {
-          const res = await attempt();
-          if (!res.ok) continue;
-          let json;
-          const text = await res.text();
-          // allorigins wraps response in { contents: "..." }
+      async function fetchOneSymbol(sym) {
+        const encodedSym = encodeURIComponent(sym.sym);
+        const apiUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodedSym}?interval=1d&range=1d`;
+        const proxies = [
+          `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`,
+          `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`
+        ];
+        for (const proxyUrl of proxies) {
           try {
-            const outer = JSON.parse(text);
-            json = outer.contents ? JSON.parse(outer.contents) : outer;
-          } catch { continue; }
-          const quotes = json?.quoteResponse?.result || [];
-          if (quotes.length === 0) continue;
-          renderMarketTiles(quotes);
-          updateMarketTimestamp();
-          return; // success — stop trying
-        } catch (e) {
-          continue;
+            const res = await fetch(proxyUrl, { cache: 'no-store' });
+            if (!res.ok) continue;
+            const text = await res.text();
+            let json;
+            try {
+              const outer = JSON.parse(text);
+              json = outer.contents ? JSON.parse(outer.contents) : outer;
+            } catch { continue; }
+            const meta = json?.chart?.result?.[0]?.meta;
+            if (!meta) continue;
+            const price = meta.regularMarketPrice;
+            const prevClose = meta.chartPreviousClose || meta.previousClose || meta.regularMarketPreviousClose;
+            const change = (price != null && prevClose != null) ? price - prevClose : null;
+            const pct = (change != null && prevClose) ? (change / prevClose) * 100 : null;
+            return { sym: sym.sym, name: sym.name, url: sym.url, price, change, pct };
+          } catch (e) { continue; }
         }
+        return { sym: sym.sym, name: sym.name, url: sym.url, price: null, change: null, pct: null };
       }
-      // All proxies failed — show fallback
-      renderMarketFallback();
+
+      try {
+        const results = await Promise.all(MARKET_SYMBOLS.map(fetchOneSymbol));
+        const hasData = results.some(r => r.price != null);
+        if (!hasData) { renderMarketFallback(); return; }
+        renderMarketTilesFromResults(results);
+        updateMarketTimestamp();
+      } catch (e) {
+        renderMarketFallback();
+      }
     }
 
-    function renderMarketTiles(quotes) {
+    function renderMarketTilesFromResults(results) {
       const container = document.getElementById('market-tiles');
       if (!container) return;
       container.innerHTML = '';
-      MARKET_SYMBOLS.forEach(sym => {
-        const q = quotes.find(r => r.symbol === sym.sym);
-        const price = q ? q.regularMarketPrice : null;
-        const change = q ? q.regularMarketChange : null;
-        const pct = q ? q.regularMarketChangePercent : null;
-        const isGain = change >= 0;
+      results.forEach(r => {
+        const isGain = r.change == null ? true : r.change >= 0;
         const color = isGain ? '#16a34a' : '#dc2626';
         const arrow = isGain ? '▲' : '▼';
-        const priceStr = price != null ? price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
-        const changeStr = change != null ? (isGain ? '+' : '') + change.toFixed(2) : '—';
-        const pctStr = pct != null ? (isGain ? '+' : '') + pct.toFixed(2) + '%' : '—';
-
+        const priceStr = r.price != null ? r.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
+        const changeStr = r.change != null ? (isGain ? '+' : '') + r.change.toFixed(2) : '—';
+        const pctStr = r.pct != null ? (isGain ? '+' : '') + r.pct.toFixed(2) + '%' : '—';
         const tile = document.createElement('a');
-        tile.href = sym.url;
+        tile.href = r.url;
         tile.target = '_blank';
         tile.rel = 'noopener noreferrer';
         tile.className = 'market-tile';
         tile.innerHTML = `
           <div class="tile-link-icon">↗</div>
-          <div class="tile-name">${sym.name}</div>
+          <div class="tile-name">${r.name}</div>
           <div class="tile-price">${priceStr}</div>
           <div class="tile-change" style="color:${color}">${arrow} ${changeStr} (${pctStr})</div>
         `;
@@ -926,6 +930,27 @@
       return [];
     }
 
+    // ── rss2json FAST FETCH (for News/Markets/AI columns) ──
+    async function fetchSingleFeedFast(feedUrl, sourceName) {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25`;
+      try {
+        const res = await fetch(apiUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error('rss2json failed');
+        const json = await res.json();
+        if (json.status !== 'ok' || !json.items?.length) throw new Error('empty');
+        return json.items.map(item => ({
+          title: item.title || '',
+          link: item.link || '',
+          pubDate: item.pubDate || '',
+          description: item.description || item.content || '',
+          source: sourceName
+        }));
+      } catch (e) {
+        // fall back to direct XML
+        return fetchSingleFeed(feedUrl, sourceName);
+      }
+    }
+
     // ── RENDERING ──
     function skeletonHTML() {
       let h = '';
@@ -976,7 +1001,11 @@
       listEl.innerHTML = skeletonHTML();
       let merged = [];
 
-      const promises = col.feeds.map(feed => fetchSingleFeed(feed.url, feed.name));
+      // Medical Education uses direct XML (freshness critical); all others use rss2json (fast)
+      const useFast = colId !== 'medical';
+      const fetchFn = useFast ? fetchSingleFeedFast : fetchSingleFeed;
+
+      const promises = col.feeds.map(feed => fetchFn(feed.url, feed.name));
       const results = await Promise.allSettled(promises);
 
       results.forEach(result => {
