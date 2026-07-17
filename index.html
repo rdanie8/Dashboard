@@ -102,7 +102,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 6px;
+        margin-bottom: 0;
       }
       .market-label {
         display: flex;
@@ -129,43 +129,62 @@
         font-size: 10px;
         color: var(--text-light);
       }
-      .market-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
+
+      /* Market Tiles — New CSS */
+      #market-tiles {
+        display: flex;
+        flex-wrap: wrap;
         gap: 6px;
+        margin-top: 6px;
       }
       .market-tile {
-        background: var(--tile-bg);
-        border: 1px solid var(--border);
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
         padding: 6px 10px;
-        min-height: 56px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        min-width: 130px;
+        flex: 1 1 130px;
+        max-width: 160px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+      }
+      .market-tile:hover {
+        background: #e8f0fe;
+        border-color: #93c5fd;
+      }
+      .tile-link-icon {
+        position: absolute;
+        top: 4px;
+        right: 6px;
+        font-size: 9px;
+        color: #9ca3af;
       }
       .tile-name {
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 700;
         color: #374151;
         text-transform: uppercase;
-        line-height: 1;
         margin-bottom: 2px;
       }
       .tile-price {
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 700;
-        color: var(--text-primary);
-        line-height: 1.2;
+        color: #111827;
+        margin-bottom: 2px;
       }
       .tile-change {
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 11px;
-        line-height: 1.2;
+        font-size: 10px;
+        font-weight: 500;
       }
-      .tile-up { color: var(--gain); }
-      .tile-down { color: var(--loss); }
+      @media (max-width: 767px) {
+        .market-tile { max-width: calc(50% - 3px); }
+      }
 
       /* Quick Links Bar */
       .quick-links-bar {
@@ -473,7 +492,6 @@
       /* Mobile responsive */
       @media (max-width: 767px) {
         .header-clock { display: none !important; }
-        .market-grid { grid-template-columns: repeat(2, 1fr); }
         .columns-container {
           flex-direction: column;
           overflow-y: auto;
@@ -516,9 +534,9 @@
           <span data-id="13" class="pulse-dot"></span>
           <span data-id="14">MARKETS</span>
         </div>
-        <div data-id="15" class="market-time" id="market-time-i4j5">Updated --:--</div>
+        <span data-id="15" class="market-time" id="market-updated">Updated --:--</span>
       </div>
-      <div data-id="16" class="market-grid" id="market-grid-m8n9"></div>
+      <div data-id="16" id="market-tiles"></div>
     </div>
 
     <!-- QUICK LINKS BAR -->
@@ -564,23 +582,30 @@
        BLOOMBERG ULTRA DASHBOARD — Light Theme, Merged Feeds
        ========================================================= */
 
-    // ── CONFIG ──
+    // ── MARKET SYMBOL DEFINITIONS ──
+    const MARKET_SYMBOLS = [
+      { sym: '^DJI',      name: 'DOW',        url: 'https://finance.yahoo.com/quote/%5EDJI/' },
+      { sym: '^GSPC',     name: 'S&P 500',    url: 'https://finance.yahoo.com/quote/%5EGSPC/' },
+      { sym: '^IXIC',     name: 'NASDAQ',     url: 'https://finance.yahoo.com/quote/%5EIXIC/' },
+      { sym: '^RUT',      name: 'RUSSELL 2K', url: 'https://finance.yahoo.com/quote/%5ERUT/' },
+      { sym: '^TNX',      name: '10Y YIELD',  url: 'https://finance.yahoo.com/quote/%5ETNX/' },
+      { sym: 'BTC-USD',   name: 'BITCOIN',    url: 'https://finance.yahoo.com/quote/BTC-USD/' },
+      { sym: 'ETH-USD',   name: 'ETHEREUM',   url: 'https://finance.yahoo.com/quote/ETH-USD/' },
+      { sym: 'GC=F',      name: 'GOLD',       url: 'https://finance.yahoo.com/quote/GC%3DF/' },
+      { sym: 'CL=F',      name: 'CRUDE OIL',  url: 'https://finance.yahoo.com/quote/CL%3DF/' },
+      { sym: 'EURUSD=X',  name: 'EUR/USD',    url: 'https://finance.yahoo.com/quote/EURUSD%3DX/' }
+    ];
+
+    // ── RSS CONFIG ──
     const CONFIG = {
-      symbols: ['^DJI','^GSPC','^IXIC','^RUT','^TNX','BTC-USD','ETH-USD','GC=F','CL=F','EURUSD=X'],
-      nameMap: {
-        '^DJI':'DOW', '^GSPC':'S&P 500', '^IXIC':'NASDAQ', '^RUT':'RUSSELL 2K',
-        '^TNX':'10Y YIELD', 'BTC-USD':'BITCOIN', 'ETH-USD':'ETHEREUM',
-        'GC=F':'GOLD', 'CL=F':'CRUDE OIL', 'EURUSD=X':'EUR/USD'
-      },
       rssProxy: 'https://api.rss2json.com/v1/api.json?rss_url=',
       corsProxy: 'https://corsproxy.io/?url=',
-      get mktRefresh() { return (parseInt(localStorage.getItem('mktInterval')) || 2) * 60 * 1000; },
       get rssRefresh() { return (parseInt(localStorage.getItem('rssInterval')) || 15) * 60 * 1000; }
     };
 
     // Columns that should have the 36-hour age filter applied
     const FILTERED_COLUMNS = new Set(['news', 'markets']);
-    const FILTER_AGE_MS = 36 * 60 * 60 * 1000; // 36 hours in milliseconds
+    const FILTER_AGE_MS = 36 * 60 * 60 * 1000;
 
     const BADGE_COLORS = {
       'AP':'#dc2626',
@@ -691,28 +716,19 @@
     function isRecent(dateStr) {
       if (!dateStr) return false;
       const delta = Date.now() - new Date(dateStr).getTime();
-      return delta < 2 * 60 * 60 * 1000; // 2 hours
-    }
-
-    function formatNum(n, decimals) {
-      if (n == null || isNaN(n)) return '—';
-      return Number(n).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      return delta < 2 * 60 * 60 * 1000;
     }
 
     function nowTimestamp() {
       return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
     }
 
-    /**
-     * Filter articles older than 36 hours. Articles with missing/unparseable
-     * pubDate are kept (included by default).
-     */
     function filterByAge(articles) {
       const now = Date.now();
       return articles.filter(article => {
-        if (!article.pubDate) return true; // keep if no date
+        if (!article.pubDate) return true;
         const parsed = new Date(article.pubDate).getTime();
-        if (isNaN(parsed)) return true; // keep if unparseable
+        if (isNaN(parsed)) return true;
         return (now - parsed) <= FILTER_AGE_MS;
       });
     }
@@ -733,66 +749,67 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // ── MARKET DATA ──
-    const FALLBACK_TICKER = [
-      { name:'DOW', price:44821.34, change:182.45, pct:0.41 },
-      { name:'S&P 500', price:6154.72, change:23.18, pct:0.38 },
-      { name:'NASDAQ', price:20437.85, change:95.62, pct:0.47 },
-      { name:'RUSSELL 2K', price:2284.56, change:-8.31, pct:-0.36 },
-      { name:'10Y YIELD', price:4.287, change:-0.023, pct:-0.53 },
-      { name:'BITCOIN', price:103842.50, change:1247.30, pct:1.22 },
-      { name:'ETHEREUM', price:3412.75, change:48.90, pct:1.45 },
-      { name:'GOLD', price:2738.40, change:12.60, pct:0.46 },
-      { name:'CRUDE OIL', price:73.28, change:-0.94, pct:-1.27 },
-      { name:'EUR/USD', price:1.0834, change:0.0012, pct:0.11 }
-    ];
-
-    function getDecimals(name) {
-      if (name === '10Y YIELD' || name === 'EUR/USD') return 4;
-      return 2;
+    // ── MARKET DATA (complete rewrite) ──
+    async function fetchMarketData() {
+      const syms = MARKET_SYMBOLS.map(s => encodeURIComponent(s.sym)).join('%2C');
+      const apiUrl = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${syms}`;
+      const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`;
+      try {
+        const res = await fetch(proxyUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const quotes = data?.quoteResponse?.result || [];
+        if (quotes.length === 0) throw new Error('No quotes returned');
+        renderMarketTiles(quotes);
+        updateMarketTimestamp();
+      } catch (err) {
+        console.warn('Market fetch failed:', err.message);
+        renderMarketFallback();
+      }
     }
 
-    function renderMarketGrid(items) {
-      const grid = document.getElementById('market-grid-m8n9');
-      grid.innerHTML = '';
-      items.forEach(item => {
-        const up = item.change >= 0;
-        const cls = up ? 'tile-up' : 'tile-down';
-        const arrow = up ? '▲' : '▼';
-        const sign = up ? '+' : '';
-        const dec = getDecimals(item.name);
-        const tile = document.createElement('div');
+    function renderMarketTiles(quotes) {
+      const container = document.getElementById('market-tiles');
+      if (!container) return;
+      container.innerHTML = '';
+      MARKET_SYMBOLS.forEach(sym => {
+        const q = quotes.find(r => r.symbol === sym.sym);
+        const price = q ? q.regularMarketPrice : null;
+        const change = q ? q.regularMarketChange : null;
+        const pct = q ? q.regularMarketChangePercent : null;
+        const isGain = change >= 0;
+        const color = isGain ? '#16a34a' : '#dc2626';
+        const arrow = isGain ? '▲' : '▼';
+        const priceStr = price != null ? price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
+        const changeStr = change != null ? (isGain ? '+' : '') + change.toFixed(2) : '—';
+        const pctStr = pct != null ? (isGain ? '+' : '') + pct.toFixed(2) + '%' : '—';
+
+        const tile = document.createElement('a');
+        tile.href = sym.url;
+        tile.target = '_blank';
+        tile.rel = 'noopener noreferrer';
         tile.className = 'market-tile';
         tile.innerHTML = `
-          <div class="tile-name">${item.name}</div>
-          <div class="tile-price">${formatNum(item.price, dec)}</div>
-          <div class="tile-change ${cls}">${arrow} ${sign}${formatNum(item.change, dec)} (${sign}${formatNum(item.pct, 2)}%)</div>
+          <div class="tile-link-icon">↗</div>
+          <div class="tile-name">${sym.name}</div>
+          <div class="tile-price">${priceStr}</div>
+          <div class="tile-change" style="color:${color}">${arrow} ${changeStr} (${pctStr})</div>
         `;
-        grid.appendChild(tile);
+        container.appendChild(tile);
       });
-      document.getElementById('market-time-i4j5').textContent = 'Updated ' + nowTimestamp();
     }
 
-    async function fetchMarketData() {
-      try {
-        const url = CONFIG.corsProxy + encodeURIComponent(
-          'https://query1.finance.yahoo.com/v8/finance/quote?symbols=' + CONFIG.symbols.join(',')
-        );
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        const data = await resp.json();
-        const results = data.quoteResponse?.result || [];
-        if (results.length === 0) throw new Error('No results');
-        const items = results.map(q => ({
-          name: CONFIG.nameMap[q.symbol] || q.shortName || q.symbol,
-          price: q.regularMarketPrice,
-          change: q.regularMarketChange,
-          pct: q.regularMarketChangePercent
-        }));
-        renderMarketGrid(items);
-      } catch (e) {
-        console.warn('Market fetch failed, using fallback:', e);
-        renderMarketGrid(FALLBACK_TICKER);
+    function renderMarketFallback() {
+      const container = document.getElementById('market-tiles');
+      if (!container) return;
+      container.innerHTML = '<div style="font-size:11px;color:#6b7280;padding:8px;">Market data unavailable — retrying…</div>';
+    }
+
+    function updateMarketTimestamp() {
+      const el = document.getElementById('market-updated');
+      if (el) {
+        const now = new Date();
+        el.textContent = 'Updated ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
       }
     }
 
@@ -811,7 +828,6 @@
       const parser = new DOMParser();
       const xml = parser.parseFromString(xmlText, 'text/xml');
 
-      // Try RSS <item> elements first
       const rssItems = [...xml.querySelectorAll('item')];
       if (rssItems.length > 0) {
         return rssItems.map(item => ({
@@ -823,7 +839,6 @@
         }));
       }
 
-      // Fallback: Atom <entry> elements (e.g. YouTube feeds)
       const atomEntries = [...xml.querySelectorAll('entry')];
       if (atomEntries.length > 0) {
         return atomEntries.map(entry => {
@@ -859,7 +874,6 @@
     }
 
     async function fetchSingleFeed(feedUrl, sourceName) {
-      // Tier 1: rss2json
       try {
         const url1 = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25`;
         const res = await fetch(url1);
@@ -870,7 +884,6 @@
         }
         throw new Error('rss2json no items');
       } catch (e1) {
-        // Tier 2: corsproxy + DOMParser
         try {
           const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(feedUrl)}`;
           const res = await fetch(proxyUrl);
@@ -947,7 +960,6 @@
 
       merged = sortByDate(merged);
 
-      // Apply 36-hour age filter for News and Markets columns only
       if (FILTERED_COLUMNS.has(colId)) {
         merged = filterByAge(merged);
       }
@@ -975,7 +987,6 @@
       const marketH = marketSection ? marketSection.offsetHeight : 0;
       const quickLinksH = quickLinksBar ? quickLinksBar.offsetHeight : 0;
 
-      // Position the quick links bar below the market section
       if (quickLinksBar) {
         quickLinksBar.style.top = (headerH + marketH) + 'px';
       }
@@ -1011,7 +1022,6 @@
         container.appendChild(div);
       });
 
-      // Collapse (mobile)
       document.querySelectorAll('[data-collapse]').forEach(el => {
         el.addEventListener('click', function(e) {
           if (window.innerWidth >= 768) return;
@@ -1026,7 +1036,6 @@
         });
       });
 
-      // Refresh per-column
       document.querySelectorAll('[data-refresh-col]').forEach(el => {
         el.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -1059,11 +1068,9 @@
     }
 
     // ── REFRESH TIMERS ──
-    let mktTimer, rssTimer;
+    let rssTimer;
     function startRefreshTimers() {
-      if (mktTimer) clearInterval(mktTimer);
       if (rssTimer) clearInterval(rssTimer);
-      mktTimer = setInterval(fetchMarketData, CONFIG.mktRefresh);
       rssTimer = setInterval(() => {
         COLUMNS.forEach(col => fetchAllFeedsForColumn(col.id));
       }, CONFIG.rssRefresh);
@@ -1084,17 +1091,19 @@
       });
 
       renderColumns();
-      renderMarketGrid(FALLBACK_TICKER);
+
+      // Market data: immediate first load + single interval
       fetchMarketData();
+      const MARKET_INTERVAL = setInterval(fetchMarketData, 2 * 60 * 1000);
 
       COLUMNS.forEach(col => fetchAllFeedsForColumn(col.id));
 
-      // Calculate layout after market grid renders
       requestAnimationFrame(() => {
         calculateLayout();
         window.addEventListener('resize', calculateLayout);
       });
 
+      // Start RSS refresh timers (market interval is handled above — only one)
       startRefreshTimers();
     }
 
