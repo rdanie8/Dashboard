@@ -196,6 +196,7 @@
         gap: 16px;
         padding: 0 14px;
         position: fixed;
+        top: 114px;
         left: 0; right: 0;
         z-index: 98;
       }
@@ -228,6 +229,7 @@
       /* Columns */
       .columns-container {
         position: fixed;
+        top: 148px;
         left: 0; right: 0; bottom: 0;
         display: flex;
       }
@@ -749,23 +751,39 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // ── MARKET DATA (complete rewrite) ──
+    // ── MARKET DATA (multi-proxy fallback) ──
     async function fetchMarketData() {
-      const syms = MARKET_SYMBOLS.map(s => encodeURIComponent(s.sym)).join('%2C');
-      const apiUrl = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${syms}`;
-      const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`;
-      try {
-        const res = await fetch(proxyUrl, { cache: 'no-store' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        const quotes = data?.quoteResponse?.result || [];
-        if (quotes.length === 0) throw new Error('No quotes returned');
-        renderMarketTiles(quotes);
-        updateMarketTimestamp();
-      } catch (err) {
-        console.warn('Market fetch failed:', err.message);
-        renderMarketFallback();
+      const syms = MARKET_SYMBOLS.map(s => s.sym).join(',');
+      const apiUrl = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${encodeURIComponent(syms)}&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent`;
+
+      const attempts = [
+        () => fetch(`https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`, { cache: 'no-store' }),
+        () => fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`, { cache: 'no-store' }),
+        () => fetch(`https://thingproxy.freeboard.io/fetch/${apiUrl}`, { cache: 'no-store' })
+      ];
+
+      for (const attempt of attempts) {
+        try {
+          const res = await attempt();
+          if (!res.ok) continue;
+          let json;
+          const text = await res.text();
+          // allorigins wraps response in { contents: "..." }
+          try {
+            const outer = JSON.parse(text);
+            json = outer.contents ? JSON.parse(outer.contents) : outer;
+          } catch { continue; }
+          const quotes = json?.quoteResponse?.result || [];
+          if (quotes.length === 0) continue;
+          renderMarketTiles(quotes);
+          updateMarketTimestamp();
+          return; // success — stop trying
+        } catch (e) {
+          continue;
+        }
       }
+      // All proxies failed — show fallback
+      renderMarketFallback();
     }
 
     function renderMarketTiles(quotes) {
@@ -984,8 +1002,8 @@
       const cols = document.getElementById('columns-container-c4d5');
 
       const headerH = 40;
-      const marketH = marketSection ? marketSection.offsetHeight : 0;
-      const quickLinksH = quickLinksBar ? quickLinksBar.offsetHeight : 0;
+      const marketH = (marketSection && marketSection.offsetHeight > 20) ? marketSection.offsetHeight : 74;
+      const quickLinksH = quickLinksBar ? quickLinksBar.offsetHeight : 34;
 
       if (quickLinksBar) {
         quickLinksBar.style.top = (headerH + marketH) + 'px';
