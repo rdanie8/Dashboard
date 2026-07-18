@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Bloomberg Ultra Dashboard v2.6 -->
+<!-- Bloomberg Ultra Dashboard v2.5 -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -527,7 +527,7 @@
       <div data-id="7" class="flex items-center gap-2">
         <button data-id="8" class="header-btn" id="settings-btn-e5f6">⚙ SETTINGS</button>
         <button data-id="9" class="header-btn" id="refresh-btn-g7h8">↺ REFRESH ALL</button>
-        <span data-id="10" class="font-mono-data" style="font-size:10px; color:#9ca3af;">v2.6</span>
+        <span data-id="10" class="font-mono-data" style="font-size:10px; color:#9ca3af;">v2.5</span>
       </div>
     </header>
 
@@ -548,35 +548,37 @@
       <span data-id="19" class="quick-links-label">🔗 QUICK LINKS</span>
       <a data-id="20" class="quick-link-btn" href="https://www.emrap.org" target="_blank" rel="noopener noreferrer">EMRAP</a>
       <a data-id="21" class="quick-link-btn" href="https://www.ecgweekly.com" target="_blank" rel="noopener noreferrer">ECG WEEKLY</a>
+      <a data-id="22" class="quick-link-btn" href="https://www.ecgweekly.com" target="_blank" rel="noopener noreferrer">ECG
+        WEEKLY</a>
     </div>
 
     <!-- MAIN COLUMNS -->
-    <div data-id="22" class="columns-container" id="columns-container-c4d5"></div>
+    <div data-id="23" class="columns-container" id="columns-container-c4d5"></div>
 
     <!-- SETTINGS MODAL -->
-    <div data-id="23" class="modal-overlay" id="settings-modal-g8h9">
-      <div data-id="24" class="modal-panel">
-        <div data-id="25" class="modal-title">Dashboard Settings</div>
-        <div data-id="26" class="modal-field">
-          <label data-id="27" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
-          <select data-id="28" class="modal-select" id="select-rss-i6j7">
-            <option data-id="29" value="5">5 minutes</option>
-            <option data-id="30" value="10">10 minutes</option>
-            <option data-id="31" value="15" selected>15 minutes</option>
-            <option data-id="32" value="30">30 minutes</option>
+    <div data-id="24" class="modal-overlay" id="settings-modal-g8h9">
+      <div data-id="25" class="modal-panel">
+        <div data-id="26" class="modal-title">Dashboard Settings</div>
+        <div data-id="27" class="modal-field">
+          <label data-id="28" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
+          <select data-id="29" class="modal-select" id="select-rss-i6j7">
+            <option data-id="30" value="5">5 minutes</option>
+            <option data-id="31" value="10">10 minutes</option>
+            <option data-id="32" value="15" selected>15 minutes</option>
+            <option data-id="33" value="30">30 minutes</option>
           </select>
         </div>
-        <div data-id="33" class="modal-field">
-          <label data-id="34" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
-          <select data-id="35" class="modal-select" id="select-mkt-q4r5">
-            <option data-id="36" value="1">1 minute</option>
-            <option data-id="37" value="2" selected>2 minutes</option>
-            <option data-id="38" value="5">5 minutes</option>
+        <div data-id="34" class="modal-field">
+          <label data-id="35" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
+          <select data-id="36" class="modal-select" id="select-mkt-q4r5">
+            <option data-id="37" value="1">1 minute</option>
+            <option data-id="38" value="2" selected>2 minutes</option>
+            <option data-id="39" value="5">5 minutes</option>
           </select>
         </div>
-        <div data-id="39" class="modal-actions">
-          <button data-id="40" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
-          <button data-id="41" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
+        <div data-id="40" class="modal-actions">
+          <button data-id="41" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
+          <button data-id="42" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
         </div>
       </div>
     </div>
@@ -711,13 +713,12 @@
       const hours = Math.floor(diff / 3600000);
       const days = Math.floor(diff / 86400000);
 
-      // Never show "just now" — always show a real time value
-      // This prevents rss2json date-substitution bug from showing stale items as fresh
-      if (mins < 1) return '< 1m ago';
+      if (mins < 0) return 'just now'; // future date guard
+      if (mins < 2) return 'just now';
       if (mins < 60) return `${mins}m ago`;
       if (hours < 24) return `${hours}h ago`;
-      if (days === 1) return '1d ago';
       if (days < 7) return `${days}d ago`;
+      // For older articles, show actual date
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: days > 365 ? 'numeric' : undefined });
     }
 
@@ -931,10 +932,9 @@
       return [];
     }
 
-    // ── rss2json FAST FETCH (for all columns) ──
-    async function fetchSingleFeedFast(feedUrl, sourceName, bypassCache = false) {
-      const cacheSuffix = bypassCache ? '&cache_time=0' : '';
-      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25${cacheSuffix}`;
+    // ── rss2json FAST FETCH (for News/Markets/AI columns) ──
+    async function fetchSingleFeedFast(feedUrl, sourceName) {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25`;
       try {
         const res = await fetch(apiUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error('rss2json failed');
@@ -1003,11 +1003,11 @@
       listEl.innerHTML = skeletonHTML();
       let merged = [];
 
-      // ALL columns use rss2json — direct XML proxies time out on Cloudflare-protected feeds (JAMA, NEJM)
-      const fetchFn = fetchSingleFeedFast;
+      // Medical Education uses direct XML (freshness critical); all others use rss2json (fast)
+      const useFast = colId !== 'medical';
+      const fetchFn = useFast ? fetchSingleFeedFast : fetchSingleFeed;
 
-      const bypassCache = colId === 'medical';
-      const promises = col.feeds.map(feed => fetchFn(feed.url, feed.name, bypassCache));
+      const promises = col.feeds.map(feed => fetchFn(feed.url, feed.name));
       const results = await Promise.allSettled(promises);
 
       results.forEach(result => {
