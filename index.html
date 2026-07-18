@@ -548,37 +548,36 @@
       <span data-id="19" class="quick-links-label">🔗 QUICK LINKS</span>
       <a data-id="20" class="quick-link-btn" href="https://www.emrap.org" target="_blank" rel="noopener noreferrer">EMRAP</a>
       <a data-id="21" class="quick-link-btn" href="https://www.ecgweekly.com" target="_blank" rel="noopener noreferrer">ECG WEEKLY</a>
-      <a data-id="22" class="quick-link-btn" href="https://www.ecgweekly.com" target="_blank" rel="noopener noreferrer">ECG
-        WEEKLY</a>
+      <a class="quick-link-btn" href="https://www.3blue1brown.com/" target="_blank" rel="noopener noreferrer">3BLUE1BROWN</a>
     </div>
 
     <!-- MAIN COLUMNS -->
-    <div data-id="23" class="columns-container" id="columns-container-c4d5"></div>
+    <div data-id="22" class="columns-container" id="columns-container-c4d5"></div>
 
     <!-- SETTINGS MODAL -->
-    <div data-id="24" class="modal-overlay" id="settings-modal-g8h9">
-      <div data-id="25" class="modal-panel">
-        <div data-id="26" class="modal-title">Dashboard Settings</div>
-        <div data-id="27" class="modal-field">
-          <label data-id="28" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
-          <select data-id="29" class="modal-select" id="select-rss-i6j7">
-            <option data-id="30" value="5">5 minutes</option>
-            <option data-id="31" value="10">10 minutes</option>
-            <option data-id="32" value="15" selected>15 minutes</option>
-            <option data-id="33" value="30">30 minutes</option>
+    <div data-id="23" class="modal-overlay" id="settings-modal-g8h9">
+      <div data-id="24" class="modal-panel">
+        <div data-id="25" class="modal-title">Dashboard Settings</div>
+        <div data-id="26" class="modal-field">
+          <label data-id="27" class="modal-label" for="select-rss-i6j7">RSS Refresh Interval</label>
+          <select data-id="28" class="modal-select" id="select-rss-i6j7">
+            <option data-id="29" value="5">5 minutes</option>
+            <option data-id="30" value="10">10 minutes</option>
+            <option data-id="31" value="15" selected>15 minutes</option>
+            <option data-id="32" value="30">30 minutes</option>
           </select>
         </div>
-        <div data-id="34" class="modal-field">
-          <label data-id="35" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
-          <select data-id="36" class="modal-select" id="select-mkt-q4r5">
-            <option data-id="37" value="1">1 minute</option>
-            <option data-id="38" value="2" selected>2 minutes</option>
-            <option data-id="39" value="5">5 minutes</option>
+        <div data-id="33" class="modal-field">
+          <label data-id="34" class="modal-label" for="select-mkt-q4r5">Market Refresh</label>
+          <select data-id="35" class="modal-select" id="select-mkt-q4r5">
+            <option data-id="36" value="1">1 minute</option>
+            <option data-id="37" value="2" selected>2 minutes</option>
+            <option data-id="38" value="5">5 minutes</option>
           </select>
         </div>
-        <div data-id="40" class="modal-actions">
-          <button data-id="41" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
-          <button data-id="42" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
+        <div data-id="39" class="modal-actions">
+          <button data-id="40" class="btn-save" id="save-settings-y2z3">Save &amp; Apply</button>
+          <button data-id="41" class="btn-cancel" id="cancel-settings-c6d7">Cancel</button>
         </div>
       </div>
     </div>
@@ -681,7 +680,7 @@
           { name: 'JWATCH GM', url: 'https://www.jwatch.org/general-medicine/rss' },
           { name: 'EMRAP', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCxwzhuYyeejWW1MIwIXi1Iw' },
           { name: 'EMCRIT', url: 'https://feeds.feedburner.com/emcrit' },
-          { name: 'JAMA', url: 'https://jama.jamanetwork.com/rss/site_3/onlineFirst_67.xml' },
+          { name: 'JAMA', url: 'https://jamanetwork.com/rss/site_3.xml' },
           { name: 'NEJM EM', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=emergency-medicine' },
           { name: 'NEJM NEURO', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=neurology-neurosurgery' },
           { name: 'JWATCH EM', url: 'https://www.jwatch.org/emergency-medicine/rss' }
@@ -795,6 +794,7 @@
         if (!hasData) { renderMarketFallback(); return; }
         renderMarketTilesFromResults(results);
         updateMarketTimestamp();
+        calculateLayout();
       } catch (e) {
         renderMarketFallback();
       }
@@ -1004,7 +1004,7 @@
       let merged = [];
 
       // Medical Education uses direct XML (freshness critical); all others use rss2json (fast)
-      const useFast = colId !== 'medical';
+      const useFast = true;
       const fetchFn = useFast ? fetchSingleFeedFast : fetchSingleFeed;
 
       const promises = col.feeds.map(feed => fetchFn(feed.url, feed.name));
