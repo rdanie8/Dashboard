@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Bloomberg Ultra Dashboard v2.5 -->
+<!-- Bloomberg Ultra Dashboard v3.0 -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -61,11 +61,8 @@
         overflow: hidden;
         height: 100vh;
       }
-      .font-mono-data {
-        font-family: 'IBM Plex Mono', monospace;
-      }
+      .font-mono-data { font-family: 'IBM Plex Mono', monospace; }
 
-      /* Header */
       .header-bar {
         height: 40px;
         background: var(--header-bg);
@@ -90,7 +87,6 @@
       }
       .header-btn:hover { background: #e5e7eb; color: #111827; }
 
-      /* Market Section */
       .market-section {
         background: var(--market-bg);
         padding: 8px 12px;
@@ -103,7 +99,6 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 0;
       }
       .market-label {
         display: flex;
@@ -130,24 +125,24 @@
         font-size: 10px;
         color: var(--text-light);
       }
-
-      /* Market Tiles — New CSS */
       #market-tiles {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
         gap: 6px;
         margin-top: 6px;
+        align-items: stretch;
+        grid-auto-rows: 84px;
       }
       .market-tile {
-        display: block;
+        display: flex;
+        flex-direction: column;
         text-decoration: none;
         color: inherit;
         background: #f9fafb;
         border: 1px solid #e5e7eb;
         padding: 6px 10px;
-        min-width: 130px;
-        flex: 1 1 130px;
-        max-width: 160px;
+        min-width: 0;
+        height: 100%;
         position: relative;
         cursor: pointer;
         transition: background 0.15s, border-color 0.15s;
@@ -183,11 +178,7 @@
         font-size: 10px;
         font-weight: 500;
       }
-      @media (max-width: 767px) {
-        .market-tile { max-width: calc(50% - 3px); }
-      }
 
-      /* Quick Links Bar */
       .quick-links-bar {
         height: 34px;
         background: #ffffff;
@@ -197,7 +188,6 @@
         gap: 16px;
         padding: 0 14px;
         position: fixed;
-        top: 114px;
         left: 0; right: 0;
         z-index: 98;
       }
@@ -227,10 +217,8 @@
       }
       .quick-link-btn:hover { background: #e5e7eb; color: #111827; }
 
-      /* Columns */
       .columns-container {
         position: fixed;
-        top: 148px;
         left: 0; right: 0; bottom: 0;
         display: flex;
       }
@@ -240,6 +228,7 @@
         flex-direction: column;
         border-right: 1px solid var(--border);
         min-width: 0;
+        min-height: 0;
         overflow: hidden;
       }
       .column:last-child { border-right: none; }
@@ -251,6 +240,9 @@
         align-items: center;
         justify-content: space-between;
         flex-shrink: 0;
+        position: sticky;
+        top: 0;
+        z-index: 2;
       }
       .col-title {
         font-family: 'IBM Plex Mono', monospace;
@@ -270,8 +262,6 @@
         cursor: pointer;
       }
       .col-meta:hover { color: var(--text-muted); }
-
-      /* 36h filter pill badge */
       .filter-pill {
         font-family: 'IBM Plex Mono', monospace;
         font-size: 9px;
@@ -284,19 +274,29 @@
         display: inline-block;
         margin-left: 4px;
       }
+      .feed-health {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+      }
+      .feed-health.ok { color: #6b7280; }
+      .feed-health.warn { color: #b45309; }
+      .feed-health.error { color: #dc2626; }
 
-      /* Article list */
       .article-list {
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
         scrollbar-width: thin;
         scrollbar-color: #d1d5db #f9fafb;
+        contain: content;
       }
       .article-list::-webkit-scrollbar { width: 4px; }
       .article-list::-webkit-scrollbar-track { background: #f9fafb; }
       .article-list::-webkit-scrollbar-thumb { background: #d1d5db; }
-
       .article-card {
         background: var(--card);
         border-bottom: 1px solid var(--border-light);
@@ -305,6 +305,8 @@
         transition: background 0.15s;
         display: block;
         text-decoration: none;
+        content-visibility: auto;
+        contain-intrinsic-size: 82px;
       }
       .article-card:hover { background: #f9fafb; }
       .article-top {
@@ -332,7 +334,8 @@
         gap: 4px;
       }
       .recent-dot {
-        width: 5px; height: 5px;
+        width: 5px;
+        height: 5px;
         background: var(--orange);
         border-radius: 50%;
         animation: pulse 1s infinite;
@@ -359,7 +362,6 @@
         line-height: 1.3;
       }
 
-      /* Skeleton */
       .skeleton-card { padding: 10px; border-bottom: 1px solid var(--border-light); }
       .skeleton-line {
         height: 10px;
@@ -377,7 +379,6 @@
         100% { background-position: -200% 0; }
       }
 
-      /* Feed error */
       .feed-error {
         display: flex;
         flex-direction: column;
@@ -402,7 +403,6 @@
       }
       .retry-btn:hover { background: #e5e7eb; }
 
-      /* Settings Modal */
       .modal-overlay {
         position: fixed;
         inset: 0;
@@ -441,18 +441,7 @@
         display: block;
         letter-spacing: 0.3px;
       }
-      .modal-input {
-        width: 100%;
-        background: #f9fafb;
-        border: 1px solid #d1d5db;
-        color: var(--text-primary);
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px;
-        padding: 6px 8px;
-        outline: none;
-        border-radius: 3px;
-      }
-      .modal-input:focus { border-color: var(--orange); }
+      .modal-input,
       .modal-select {
         width: 100%;
         background: #f9fafb;
@@ -464,6 +453,8 @@
         outline: none;
         border-radius: 3px;
       }
+      .modal-input:focus,
+      .modal-select:focus { border-color: var(--orange); }
       .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
       .btn-save {
         background: var(--orange);
@@ -492,7 +483,6 @@
       }
       .btn-cancel:hover { background: #e5e7eb; }
 
-      /* Mobile responsive */
       @media (max-width: 767px) {
         .header-clock { display: none !important; }
         .columns-container {
@@ -508,6 +498,7 @@
         .col-header { cursor: pointer; }
         .col-header .collapse-icon { display: inline-block; }
         .article-list { max-height: 400px; }
+        #market-tiles { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
       }
       @media (min-width: 768px) {
         .col-header .collapse-icon { display: none; }
@@ -518,20 +509,18 @@
     <app-icon data-id="1" hidden data-icon="trending-up" data-palette="Earth"></app-icon>
     <app-disclaimer data-id="2" intent="financial"></app-disclaimer>
 
-    <!-- HEADER BAR -->
     <header data-id="3" class="header-bar" id="header-bar-a1b2">
       <div data-id="4" class="flex items-center gap-2">
-        <span data-id="5" class="font-mono-data font-bold" style="font-size:14px; letter-spacing:1px; color:#ff9400;">◼ BLOOMBERG ULTRA</span>
+        <span data-id="5" class="font-mono-data font-bold" style="font-size:14px; letter-spacing:1px; color:#ff9400;">BLOOMBERG ULTRA</span>
       </div>
       <div data-id="6" class="header-clock font-mono-data" style="font-size:12px; color:#6b7280;" id="header-clock-c3d4"></div>
       <div data-id="7" class="flex items-center gap-2">
-        <button data-id="8" class="header-btn" id="settings-btn-e5f6">⚙ SETTINGS</button>
-        <button data-id="9" class="header-btn" id="refresh-btn-g7h8">↺ REFRESH ALL</button>
-        <span data-id="10" class="font-mono-data" style="font-size:10px; color:#9ca3af;">v2.5</span>
+        <button data-id="8" class="header-btn" id="settings-btn-e5f6">SETTINGS</button>
+        <button data-id="9" class="header-btn" id="refresh-btn-g7h8">REFRESH ALL</button>
+        <span data-id="10" class="font-mono-data" style="font-size:10px; color:#9ca3af;">v3.0</span>
       </div>
     </header>
 
-    <!-- MARKET SECTION -->
     <div data-id="11" class="market-section" id="market-section-w2x3">
       <div data-id="12" class="market-header">
         <div data-id="13" class="market-label">
@@ -543,18 +532,15 @@
       <div data-id="17" id="market-tiles"></div>
     </div>
 
-    <!-- QUICK LINKS BAR -->
     <div data-id="18" class="quick-links-bar" id="quick-links-bar-q1r2">
-      <span data-id="19" class="quick-links-label">🔗 QUICK LINKS</span>
+      <span data-id="19" class="quick-links-label">QUICK LINKS</span>
       <a data-id="20" class="quick-link-btn" href="https://www.emrap.org" target="_blank" rel="noopener noreferrer">EMRAP</a>
       <a data-id="21" class="quick-link-btn" href="https://www.ecgweekly.com" target="_blank" rel="noopener noreferrer">ECG WEEKLY</a>
       <a class="quick-link-btn" href="https://www.3blue1brown.com/" target="_blank" rel="noopener noreferrer">3BLUE1BROWN</a>
     </div>
 
-    <!-- MAIN COLUMNS -->
     <div data-id="22" class="columns-container" id="columns-container-c4d5"></div>
 
-    <!-- SETTINGS MODAL -->
     <div data-id="23" class="modal-overlay" id="settings-modal-g8h9">
       <div data-id="24" class="modal-panel">
         <div data-id="25" class="modal-title">Dashboard Settings</div>
@@ -583,529 +569,1045 @@
     </div>
 
     <script>
-    /* =========================================================
-       BLOOMBERG ULTRA DASHBOARD — Light Theme, Merged Feeds
-       ========================================================= */
+    const STORAGE_KEYS = {
+      rssInterval: 'rssInterval',
+      marketInterval: 'mktInterval',
+      feedCachePrefix: 'bloomberg.feed.cache:',
+      feedStats: 'bloomberg.feed.stats',
+      marketCache: 'bloomberg.market.cache'
+    };
 
-    // ── MARKET SYMBOL DEFINITIONS ──
+    const CONFIG = {
+      feedTimeoutMs: 5000,
+      rss2jsonDelayMs: 250,
+      articleBatchSize: 12,
+      maxColumnItems: 40,
+      ageLimitMs: 36 * 60 * 60 * 1000
+    };
+
     const MARKET_SYMBOLS = [
-      { sym: '^DJI',      name: 'DOW',        url: 'https://finance.yahoo.com/quote/%5EDJI/' },
-      { sym: '^GSPC',     name: 'S&P 500',    url: 'https://finance.yahoo.com/quote/%5EGSPC/' },
-      { sym: '^IXIC',     name: 'NASDAQ',     url: 'https://finance.yahoo.com/quote/%5EIXIC/' },
-      { sym: '^RUT',      name: 'RUSSELL 2K', url: 'https://finance.yahoo.com/quote/%5ERUT/' },
-      { sym: '^TNX',      name: '10Y YIELD',  url: 'https://finance.yahoo.com/quote/%5ETNX/' },
-      { sym: 'BTC-USD',   name: 'BITCOIN',    url: 'https://finance.yahoo.com/quote/BTC-USD/' },
-      { sym: 'ETH-USD',   name: 'ETHEREUM',   url: 'https://finance.yahoo.com/quote/ETH-USD/' },
-      { sym: 'GC=F',      name: 'GOLD',       url: 'https://finance.yahoo.com/quote/GC%3DF/' },
-      { sym: 'CL=F',      name: 'CRUDE OIL',  url: 'https://finance.yahoo.com/quote/CL%3DF/' },
-      { sym: 'EURUSD=X',  name: 'EUR/USD',    url: 'https://finance.yahoo.com/quote/EURUSD%3DX/' }
+      { sym: '^DJI', name: 'DOW', url: 'https://finance.yahoo.com/quote/%5EDJI/' },
+      { sym: '^GSPC', name: 'S&P 500', url: 'https://finance.yahoo.com/quote/%5EGSPC/' },
+      { sym: '^IXIC', name: 'NASDAQ', url: 'https://finance.yahoo.com/quote/%5EIXIC/' },
+      { sym: '^RUT', name: 'RUSSELL 2K', url: 'https://finance.yahoo.com/quote/%5ERUT/' },
+      { sym: '^TNX', name: '10Y YIELD', url: 'https://finance.yahoo.com/quote/%5ETNX/' },
+      { sym: 'BTC-USD', name: 'BITCOIN', url: 'https://finance.yahoo.com/quote/BTC-USD/' },
+      { sym: 'ETH-USD', name: 'ETHEREUM', url: 'https://finance.yahoo.com/quote/ETH-USD/' },
+      { sym: 'GC=F', name: 'GOLD', url: 'https://finance.yahoo.com/quote/GC%3DF/' },
+      { sym: 'CL=F', name: 'CRUDE OIL', url: 'https://finance.yahoo.com/quote/CL%3DF/' },
+      { sym: 'EURUSD=X', name: 'EUR/USD', url: 'https://finance.yahoo.com/quote/EURUSD%3DX/' }
     ];
 
-    // ── RSS CONFIG ──
-    const CONFIG = {
-      corsProxy: 'https://corsproxy.io/?url=',
-      get rssRefresh() { return (parseInt(localStorage.getItem('rssInterval')) || 15) * 60 * 1000; }
-    };
-
-    // Columns that should have the 36-hour age filter applied
-    const FILTERED_COLUMNS = new Set(['news', 'markets']);
-    const FILTER_AGE_MS = 36 * 60 * 60 * 1000;
-
     const BADGE_COLORS = {
-      'AP':'#dc2626',
-      'WAPO':'#1a1a1a',
-      'NYT':'#1a1a1a',
-      'WSJ':'#004b87',
-      'BBC':'#bb1919',
-      'TIME':'#c8102e',
-      'Y!FIN':'#6001d2',
-      'MKTWTCH':'#00a651',
-      'arXiv IR':'#b45309',
-      'arXiv CR':'#b45309',
-      'arXiv LG':'#b45309',
-      'arXiv ML':'#b45309',
-      'arXiv CV':'#b45309',
-      'arXiv AI':'#b45309',
-      'MIT AI':'#d72638',
-      'MIT NEWS':'#d72638',
-      '3B1B':'#1565c0',
-      'BMJ OPEN':'#005eb8',
-      'JWATCH GM':'#003087',
-      'EMRAP':'#cc0000',
-      'EMCRIT':'#e53e3e',
-      'JAMA':'#c41230',
-      'NEJM EM':'#003087',
-      'NEJM NEURO':'#003087',
-      'JWATCH EM':'#003087'
+      AP: '#dc2626',
+      WAPO: '#1a1a1a',
+      NYT: '#1a1a1a',
+      WSJ: '#004b87',
+      BBC: '#bb1919',
+      TIME: '#c8102e',
+      'Y!FIN': '#6001d2',
+      MKTWTCH: '#00a651',
+      'arXiv IR': '#b45309',
+      'arXiv CR': '#b45309',
+      'arXiv LG': '#b45309',
+      'arXiv ML': '#b45309',
+      'arXiv CV': '#b45309',
+      'arXiv AI': '#b45309',
+      'MIT AI': '#d72638',
+      'MIT NEWS': '#d72638',
+      '3B1B': '#1565c0',
+      BMJ: '#005eb8',
+      'BMJ OPEN': '#005eb8',
+      'JWATCH GM': '#003087',
+      EMRAP: '#cc0000',
+      EMCRIT: '#e53e3e',
+      JAMA: '#c41230',
+      'NEJM EM': '#003087',
+      'NEJM NEURO': '#003087',
+      'JWATCH EM': '#003087'
     };
+
+    function slugify(value) {
+      return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    function loadJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveJson(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {
+        return;
+      }
+    }
+
+    const FEED_STATS = loadJson(STORAGE_KEYS.feedStats, {});
+    const feedCacheMemory = new Map();
+    const columnState = {};
 
     const COLUMNS = [
       {
-        id: 'news', label: 'NEWS (24h)',
+        id: 'news',
+        label: 'NEWS (24h)',
+        ageLimitMs: CONFIG.ageLimitMs,
         feeds: [
-          { name: 'AP', url: 'https://feedx.net/rss/ap.xml' },
-          { name: 'WAPO', url: 'https://feeds.washingtonpost.com/rss/world' },
-          { name: 'NYT', url: 'https://www.nytimes.com/services/xml/rss/nyt/HomePage.xml' },
-          { name: 'WSJ', url: 'https://feeds.content.dowjones.io/public/rss/RSSWorldNews' },
-          { name: 'BBC', url: 'https://feeds.bbci.co.uk/news/rss.xml' },
-          { name: 'TIME', url: 'https://time.com/feed/' }
+          { name: 'AP', url: 'https://feedx.net/rss/ap.xml', strategy: 'race' },
+          { name: 'WAPO', url: 'https://feeds.washingtonpost.com/rss/world', strategy: 'race' },
+          { name: 'NYT', url: 'https://www.nytimes.com/services/xml/rss/nyt/HomePage.xml', strategy: 'race' },
+          { name: 'WSJ', url: 'https://feeds.content.dowjones.io/public/rss/RSSWorldNews', strategy: 'race' },
+          { name: 'BBC', url: 'https://feeds.bbci.co.uk/news/rss.xml', strategy: 'race', alternates: ['https://feeds.bbci.co.uk/news/world/rss.xml'] },
+          { name: 'TIME', url: 'https://time.com/feed/', strategy: 'race' }
         ]
       },
       {
-        id: 'markets', label: 'MARKETS (TODAY)',
+        id: 'markets',
+        label: 'MARKETS (TODAY)',
+        ageLimitMs: CONFIG.ageLimitMs,
         feeds: [
-          { name: 'Y!FIN', url: 'https://finance.yahoo.com/rss/techticker' },
-          { name: 'MKTWTCH', url: 'https://feeds.marketwatch.com/marketwatch/marketpulse/' },
-          { name: 'WSJ', url: 'https://feeds.a.dj.com/rss/RSSMarketsMain.xml' }
+          { name: 'Y!FIN', url: 'https://finance.yahoo.com/rss/techticker', strategy: 'rss2json' },
+          { name: 'MKTWTCH', url: 'https://feeds.marketwatch.com/marketwatch/marketpulse/', strategy: 'race' },
+          { name: 'WSJ', url: 'https://feeds.a.dj.com/rss/RSSMarketsMain.xml', strategy: 'race' }
         ]
       },
       {
-        id: 'ai', label: 'AI LEARNING',
+        id: 'ai',
+        label: 'AI LEARNING',
         feeds: [
-          { name: 'arXiv IR', url: 'https://arxiv.org/rss/cs.IR' },
-          { name: 'arXiv CR', url: 'https://arxiv.org/rss/cs.CR' },
-          { name: 'arXiv LG', url: 'https://arxiv.org/rss/cs.LG' },
-          { name: 'arXiv ML', url: 'https://arxiv.org/rss/stat.ML' },
-          { name: 'arXiv CV', url: 'https://arxiv.org/rss/cs.CV' },
-          { name: 'arXiv AI', url: 'https://arxiv.org/rss/cs.AI' },
-          { name: 'MIT AI', url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed' },
-          { name: 'MIT NEWS', url: 'https://www.technologyreview.com/topnews.rss' },
-          { name: '3B1B', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCoxcjq-8xIDTYp3uz647V5A' }
+          { name: 'arXiv IR', url: 'https://arxiv.org/rss/cs.IR', strategy: 'direct', alternates: ['https://export.arxiv.org/rss/cs.IR'] },
+          { name: 'arXiv CR', url: 'https://arxiv.org/rss/cs.CR', strategy: 'direct', alternates: ['https://export.arxiv.org/rss/cs.CR'] },
+          { name: 'arXiv LG', url: 'https://arxiv.org/rss/cs.LG', strategy: 'direct', alternates: ['https://export.arxiv.org/rss/cs.LG'] },
+          { name: 'arXiv ML', url: 'https://arxiv.org/rss/stat.ML', strategy: 'direct', alternates: ['https://export.arxiv.org/rss/stat.ML'] },
+          { name: 'arXiv CV', url: 'https://arxiv.org/rss/cs.CV', strategy: 'direct', alternates: ['https://export.arxiv.org/rss/cs.CV'] },
+          { name: 'arXiv AI', url: 'https://arxiv.org/rss/cs.AI', strategy: 'direct', alternates: ['https://export.arxiv.org/rss/cs.AI'] },
+          { name: 'MIT AI', url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed', strategy: 'direct', alternates: ['https://www.technologyreview.com/feed/'] },
+          { name: 'MIT NEWS', url: 'https://www.technologyreview.com/topnews.rss', strategy: 'direct', alternates: ['https://www.technologyreview.com/feed/'] },
+          { name: '3B1B', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCoxcjq-8xIDTYp3uz647V5A', strategy: 'direct' }
         ]
       },
       {
-        id: 'medical', label: 'MEDICAL EDU',
+        id: 'medical',
+        label: 'MEDICAL EDU',
         feeds: [
-          { name: 'BMJ OPEN', url: 'https://bmjopen.bmj.com/rss/current.xml' },
-          { name: 'JWATCH GM', url: 'https://www.jwatch.org/general-medicine/rss' },
-          { name: 'EMRAP', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCxwzhuYyeejWW1MIwIXi1Iw' },
-          { name: 'EMCRIT', url: 'https://feeds.feedburner.com/emcrit' },
-          { name: 'JAMA', url: 'https://jamanetwork.com/rss/site_3.xml' },
-          { name: 'NEJM EM', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=emergency-medicine' },
-          { name: 'NEJM NEURO', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=neurology-neurosurgery' },
-          { name: 'JWATCH EM', url: 'https://www.jwatch.org/emergency-medicine/rss' }
+          { name: 'BMJ', url: 'https://www.bmj.com/rss/recent.xml', strategy: 'direct', alternates: ['https://bmjopen.bmj.com/rss/current.xml'], maxItems: 8 },
+          { name: 'JWATCH GM', url: 'https://www.jwatch.org/general-medicine/rss', strategy: 'direct', maxItems: 8 },
+          { name: 'EMRAP', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCxwzhuYyeejWW1MIwIXi1Iw', strategy: 'direct', maxItems: 8 },
+          { name: 'EMCRIT', url: 'https://feeds.feedburner.com/emcrit', strategy: 'direct', maxItems: 8 },
+          { name: 'JAMA', url: 'https://jamanetwork.com/journals/jama/newonline/rss', strategy: 'direct', alternates: ['https://jamanetwork.com/journals/jama/pages/rss'], maxItems: 8 },
+          { name: 'NEJM EM', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=emergency-medicine', strategy: 'direct', maxItems: 8 },
+          { name: 'NEJM NEURO', url: 'https://onesearch-rss.nejm.org/api/specialty/rss?context=nejm&specialty=neurology-neurosurgery', strategy: 'direct', maxItems: 8 },
+          { name: 'JWATCH EM', url: 'https://www.jwatch.org/emergency-medicine/rss', strategy: 'direct', maxItems: 8 }
         ]
       }
     ];
 
-    // ── STATE ──
-    const columnState = {};
-    COLUMNS.forEach(col => {
-      columnState[col.id] = { mergedArticles: [], lastFetch: 0, collapsed: false };
+    COLUMNS.forEach((column) => {
+      column.feeds.forEach((feed) => {
+        feed.key = `${column.id}:${slugify(feed.name)}`;
+      });
     });
 
-    // ── UTILITIES ──
-    function stripHTML(str) {
-      if (!str) return '';
-      const d = document.createElement('div');
-      d.innerHTML = str;
-      return d.textContent?.trim() || '';
+    COLUMNS.forEach((column) => {
+      columnState[column.id] = {
+        articlesByFeed: new Map(),
+        mergedArticles: [],
+        pendingFeeds: new Set(),
+        failedFeeds: new Map(),
+        renderToken: 0,
+        renderScheduled: false,
+        lastFetchAt: 0,
+        lastSignature: '',
+        hasCache: false,
+        retryQueued: false,
+        collapsed: false
+      };
+    });
+
+    function getColumn(colId) {
+      return COLUMNS.find((column) => column.id === colId);
     }
 
-    function timeAgo(dateStr) {
-      if (!dateStr) return '';
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return '';
-      const now = Date.now();
-      const diff = now - date.getTime();
-      const mins = Math.floor(diff / 60000);
+    function getColumnState(colId) {
+      return columnState[colId];
+    }
+
+    function stripHTML(value) {
+      if (!value) return '';
+      const element = document.createElement('div');
+      element.innerHTML = value;
+      return element.textContent?.trim() || '';
+    }
+
+    function normalizeWhitespace(value) {
+      return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function normalizeUrl(value) {
+      if (!value) return '';
+      try {
+        const url = new URL(value, window.location.href);
+        url.hash = '';
+        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'ref', 'cmpid'].forEach((param) => url.searchParams.delete(param));
+        return url.toString();
+      } catch {
+        return String(value).trim();
+      }
+    }
+
+    function parseDate(value) {
+      if (!value) return null;
+      if (typeof value === 'number' && Number.isFinite(value)) return value;
+      const text = String(value).trim();
+      if (!text) return null;
+      if (/^\d{10,13}$/.test(text)) {
+        const numeric = Number(text);
+        return text.length === 10 ? numeric * 1000 : numeric;
+      }
+      const parsed = Date.parse(text);
+      return Number.isNaN(parsed) ? null : parsed;
+    }
+
+    function timeAgo(value) {
+      const timestamp = typeof value === 'number' ? value : parseDate(value);
+      if (!timestamp) return '';
+      const diff = Date.now() - timestamp;
+      if (diff < 0 || diff < 2 * 60 * 1000) return 'just now';
+      const minutes = Math.floor(diff / 60000);
       const hours = Math.floor(diff / 3600000);
       const days = Math.floor(diff / 86400000);
-
-      if (mins < 0) return 'just now'; // future date guard
-      if (mins < 2) return 'just now';
-      if (mins < 60) return `${mins}m ago`;
+      if (minutes < 60) return `${minutes}m ago`;
       if (hours < 24) return `${hours}h ago`;
       if (days < 7) return `${days}d ago`;
-      // For older articles, show actual date
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: days > 365 ? 'numeric' : undefined });
+      return new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
-    function isRecent(dateStr) {
-      if (!dateStr) return false;
-      const delta = Date.now() - new Date(dateStr).getTime();
-      return delta < 2 * 60 * 60 * 1000;
+    function isRecent(value) {
+      const timestamp = typeof value === 'number' ? value : parseDate(value);
+      return Boolean(timestamp && Date.now() - timestamp < 2 * 60 * 60 * 1000);
     }
 
     function nowTimestamp() {
       return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
     }
 
-    function filterByAge(articles) {
-      const now = Date.now();
-      return articles.filter(article => {
-        if (!article.pubDate) return true;
-        const parsed = new Date(article.pubDate).getTime();
-        if (isNaN(parsed)) return true;
-        return (now - parsed) <= FILTER_AGE_MS;
+    function makeArticleKey(article) {
+      const title = normalizeWhitespace(article.title).toLowerCase();
+      const link = normalizeUrl(article.link).toLowerCase();
+      return title || link;
+    }
+
+    function getFeedCacheKey(feedKey) {
+      return `${STORAGE_KEYS.feedCachePrefix}${feedKey}`;
+    }
+
+    function readFeedCache(feedKey) {
+      const memory = feedCacheMemory.get(feedKey);
+      if (memory) return memory;
+      try {
+        const raw = localStorage.getItem(getFeedCacheKey(feedKey));
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        feedCacheMemory.set(feedKey, parsed);
+        return parsed;
+      } catch {
+        return null;
+      }
+    }
+
+    function writeFeedCache(feedKey, payload) {
+      const cache = {
+        updatedAt: Date.now(),
+        items: payload.items || [],
+        method: payload.method || '',
+        sourceUrl: payload.sourceUrl || '',
+        feedName: payload.feedName || ''
+      };
+      feedCacheMemory.set(feedKey, cache);
+      try {
+        localStorage.setItem(getFeedCacheKey(feedKey), JSON.stringify(cache));
+      } catch {
+        return;
+      }
+    }
+
+    function readFeedStats(feedKey) {
+      return FEED_STATS[feedKey] || {};
+    }
+
+    function updateFeedStats(feedKey, nextStats) {
+      FEED_STATS[feedKey] = { ...readFeedStats(feedKey), ...nextStats };
+      saveJson(STORAGE_KEYS.feedStats, FEED_STATS);
+    }
+
+    function feedSourceList(feed) {
+      return [feed.url, ...(feed.alternates || [])].filter(Boolean);
+    }
+
+    function buildProxyUrls(url) {
+      const busted = `${url}${url.includes('?') ? '&' : '?'}_cb=${Date.now()}`;
+      return [
+        `https://corsproxy.io/?url=${encodeURIComponent(busted)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(busted)}`,
+        `https://api.allorigins.win/get?url=${encodeURIComponent(busted)}`
+      ];
+    }
+
+    async function fetchWithTimeout(url, init = {}, timeoutMs = CONFIG.feedTimeoutMs) {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+      if (init.signal) {
+        if (init.signal.aborted) {
+          controller.abort();
+        } else {
+          init.signal.addEventListener('abort', () => controller.abort(), { once: true });
+        }
+      }
+      try {
+        return await fetch(url, { ...init, cache: 'no-store', signal: controller.signal });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    function normalizeArticle(raw, feed, index, method) {
+      const title = normalizeWhitespace(stripHTML(raw.title));
+      const link = normalizeUrl(raw.link || '');
+      const description = normalizeWhitespace(stripHTML(raw.description));
+      const pubDateMs = parseDate(raw.pubDate);
+      return {
+        key: makeArticleKey({ title, link }),
+        title,
+        link,
+        description,
+        source: feed.name,
+        sourceKey: feed.key,
+        sourceMethod: method,
+        pubDateMs,
+        fetchedAt: Date.now(),
+        feedOrder: index
+      };
+    }
+
+    function parseRssXml(xmlText, feed) {
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, 'text/xml');
+      if (xml.querySelector('parsererror')) {
+        throw new Error(`XML parse failed for ${feed.name}`);
+      }
+
+      const rssItems = [...xml.querySelectorAll('item')];
+      if (rssItems.length) {
+        return rssItems.map((item, index) => normalizeArticle({
+          title: item.querySelector('title')?.textContent || '',
+          link: item.querySelector('link')?.textContent || item.querySelector('guid')?.textContent || '',
+          description: item.querySelector('description')?.textContent || item.querySelector('content\\:encoded')?.textContent || '',
+          pubDate: item.querySelector('pubDate')?.textContent ||
+            item.querySelector('published')?.textContent ||
+            item.querySelector('updated')?.textContent ||
+            item.querySelector('dc\\:date')?.textContent ||
+            ''
+        }, feed, index, 'direct'));
+      }
+
+      const atomEntries = [...xml.querySelectorAll('entry')];
+      if (atomEntries.length) {
+        return atomEntries.map((entry, index) => {
+          const altLink = entry.querySelector('link[rel="alternate"]');
+          const linkNode = entry.querySelector('link');
+          return normalizeArticle({
+            title: entry.querySelector('title')?.textContent || '',
+            link: altLink?.getAttribute('href') || linkNode?.getAttribute('href') || linkNode?.textContent || entry.querySelector('id')?.textContent || '',
+            description: entry.querySelector('summary')?.textContent ||
+              entry.querySelector('content')?.textContent ||
+              entry.getElementsByTagNameNS('http://search.yahoo.com/mrss/', 'description')?.[0]?.textContent ||
+              '',
+            pubDate: entry.querySelector('published')?.textContent ||
+              entry.querySelector('updated')?.textContent ||
+              ''
+          }, feed, index, 'direct');
+        });
+      }
+
+      throw new Error(`No feed items found for ${feed.name}`);
+    }
+
+    function parseRss2Json(json, feed) {
+      if (!json || json.status !== 'ok' || !Array.isArray(json.items)) {
+        throw new Error(`rss2json failed for ${feed.name}`);
+      }
+      return json.items.map((item, index) => normalizeArticle({
+        title: item.title || '',
+        link: item.link || item.guid || '',
+        description: item.description || item.content || item.contentSnippet || '',
+        pubDate: item.pubDate || item.published || item.isoDate || ''
+      }, feed, index, 'rss2json'));
+    }
+
+    function dedupeArticles(articles) {
+      const seen = new Map();
+      for (const article of articles) {
+        const key = article.key || makeArticleKey(article);
+        const existing = seen.get(key);
+        if (!existing) {
+          seen.set(key, article);
+          continue;
+        }
+        const existingScore = existing.pubDateMs || existing.fetchedAt || 0;
+        const nextScore = article.pubDateMs || article.fetchedAt || 0;
+        if (nextScore > existingScore) {
+          seen.set(key, article);
+        }
+      }
+      return [...seen.values()];
+    }
+
+    function sortArticles(articles) {
+      return articles.sort((left, right) => {
+        const leftScore = left.pubDateMs || left.fetchedAt || 0;
+        const rightScore = right.pubDateMs || right.fetchedAt || 0;
+        if (rightScore !== leftScore) return rightScore - leftScore;
+        if (right.feedOrder !== left.feedOrder) return left.feedOrder - right.feedOrder;
+        return left.source.localeCompare(right.source);
       });
     }
 
-    // ── CLOCK ──
-    function updateClock() {
-      const now = new Date();
-      const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-      const d = days[now.getDay()];
-      const day = String(now.getDate()).padStart(2,'0');
-      const mon = months[now.getMonth()];
-      const yr = now.getFullYear();
-      const time = now.toLocaleTimeString('en-US', { hour12: false });
-      const el = document.getElementById('header-clock-c3d4');
-      if (el) el.textContent = `${d} ${day} ${mon} ${yr}  ${time} CDT`;
+    function filterByAge(articles, ageLimitMs) {
+      if (!ageLimitMs) return articles;
+      return articles.filter((article) => {
+        if (!article.pubDateMs) return true;
+        return Date.now() - article.pubDateMs <= ageLimitMs;
+      });
     }
-    setInterval(updateClock, 1000);
-    updateClock();
 
-    // ── MARKET DATA (Yahoo Finance chart API — per-symbol, parallel) ──
-    async function fetchMarketData() {
-      async function fetchOneSymbol(sym) {
-        const encodedSym = encodeURIComponent(sym.sym);
-        const apiUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodedSym}?interval=1d&range=1d`;
-        const proxies = [
-          `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`,
-          `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`
-        ];
-        for (const proxyUrl of proxies) {
-          try {
-            const res = await fetch(proxyUrl, { cache: 'no-store' });
-            if (!res.ok) continue;
-            const text = await res.text();
-            let json;
-            try {
-              const outer = JSON.parse(text);
-              json = outer.contents ? JSON.parse(outer.contents) : outer;
-            } catch { continue; }
-            const meta = json?.chart?.result?.[0]?.meta;
-            if (!meta) continue;
-            const price = meta.regularMarketPrice;
-            const prevClose = meta.chartPreviousClose || meta.previousClose || meta.regularMarketPreviousClose;
-            const change = (price != null && prevClose != null) ? price - prevClose : null;
-            const pct = (change != null && prevClose) ? (change / prevClose) * 100 : null;
-            return { sym: sym.sym, name: sym.name, url: sym.url, price, change, pct };
-          } catch (e) { continue; }
-        }
-        return { sym: sym.sym, name: sym.name, url: sym.url, price: null, change: null, pct: null };
+    function trimArticles(articles, limit) {
+      return articles.slice(0, limit || CONFIG.maxColumnItems);
+    }
+
+    function skeletonHTML() {
+      let html = '';
+      for (let index = 0; index < 4; index += 1) {
+        html += '<div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div>';
       }
+      return html;
+    }
+
+    function createErrorNode(message, showRetry, onRetry) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'feed-error';
+      const messageNode = document.createElement('span');
+      messageNode.textContent = message;
+      wrapper.appendChild(messageNode);
+      if (showRetry && typeof onRetry === 'function') {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'retry-btn';
+        button.textContent = 'RETRY';
+        button.addEventListener('click', onRetry);
+        wrapper.appendChild(button);
+      }
+      return wrapper;
+    }
+
+    function createArticleNode(article) {
+      const link = document.createElement('a');
+      link.className = 'article-card';
+      link.href = article.link || '#';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+
+      const top = document.createElement('div');
+      top.className = 'article-top';
+
+      const source = document.createElement('span');
+      source.className = 'source-badge';
+      source.style.background = BADGE_COLORS[article.source] || '#6b7280';
+      source.textContent = article.source;
+
+      const time = document.createElement('span');
+      time.className = 'time-ago';
+      if (isRecent(article.pubDateMs)) {
+        const dot = document.createElement('span');
+        dot.className = 'recent-dot';
+        time.appendChild(dot);
+      }
+      time.appendChild(document.createTextNode(timeAgo(article.pubDateMs)));
+
+      top.appendChild(source);
+      top.appendChild(time);
+
+      const title = document.createElement('div');
+      title.className = 'article-title';
+      title.textContent = article.title || '';
+
+      link.appendChild(top);
+      link.appendChild(title);
+
+      if (article.description) {
+        const description = document.createElement('div');
+        description.className = 'article-desc';
+        description.textContent = article.description;
+        link.appendChild(description);
+      }
+
+      return link;
+    }
+
+    function updateColumnHealth(colId) {
+      const state = getColumnState(colId);
+      const healthEl = document.getElementById(`col-health-${colId}`);
+      if (!healthEl) return;
+      const total = getColumn(colId)?.feeds.length || 0;
+      const done = total - state.pendingFeeds.size;
+      const failed = state.failedFeeds.size;
+      let label = `${done}/${total}`;
+      let className = 'ok';
+      if (state.pendingFeeds.size > 0) {
+        label += ' LIVE';
+        className = failed ? 'warn' : 'ok';
+      }
+      if (failed > 0) {
+        label = `${label} FAIL ${[...state.failedFeeds.values()].map((feed) => feed.name).join(', ')}`;
+        className = 'error';
+      }
+      healthEl.textContent = label;
+      healthEl.className = `feed-health ${className}`;
+      healthEl.title = failed > 0 ? [...state.failedFeeds.values()].map((feed) => feed.name).join(', ') : 'Feed health OK';
+    }
+
+    function updateColumnTimestamp(colId, timestamp) {
+      const el = document.getElementById(`col-time-${colId}`);
+      if (!el) return;
+      el.textContent = timestamp ? new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : nowTimestamp();
+    }
+
+    function renderArticleList(colId, articles, emptyMessage) {
+      const state = getColumnState(colId);
+      const listEl = document.getElementById(`articles-${colId}`);
+      if (!listEl) return;
+      state.renderToken += 1;
+      const token = state.renderToken;
+      const previousScrollTop = listEl.scrollTop;
+      listEl.replaceChildren();
+
+      if (!articles.length) {
+        listEl.appendChild(createErrorNode(emptyMessage || 'No articles found', false));
+        return;
+      }
+
+      let index = 0;
+      const renderBatch = () => {
+        if (token !== state.renderToken) return;
+        const fragment = document.createDocumentFragment();
+        const end = Math.min(index + CONFIG.articleBatchSize, articles.length);
+        for (; index < end; index += 1) {
+          fragment.appendChild(createArticleNode(articles[index]));
+        }
+        listEl.appendChild(fragment);
+        if (index < articles.length) {
+          requestAnimationFrame(renderBatch);
+        } else if (previousScrollTop > 0) {
+          requestAnimationFrame(() => {
+            listEl.scrollTop = previousScrollTop;
+          });
+        }
+      };
+
+      renderBatch();
+    }
+
+    function renderColumn(colId) {
+      const column = getColumn(colId);
+      const state = getColumnState(colId);
+      if (!column) return;
+
+      const articles = [];
+      state.articlesByFeed.forEach((items) => {
+        articles.push(...items);
+      });
+
+      let merged = dedupeArticles(articles);
+      merged = sortArticles(merged);
+      merged = filterByAge(merged, column.ageLimitMs);
+      merged = trimArticles(merged, CONFIG.maxColumnItems);
+      state.mergedArticles = merged;
+
+      const signature = merged.slice(0, 60).map((article) => article.key).join('|');
+      if (signature === state.lastSignature && document.getElementById(`articles-${colId}`)?.childElementCount > 0) {
+        updateColumnHealth(colId);
+        updateColumnTimestamp(colId, state.lastFetchAt);
+        return;
+      }
+      state.lastSignature = signature;
+
+      if (!merged.length) {
+        if (state.pendingFeeds.size > 0 && !state.hasCache) return;
+        const failedNames = [...state.failedFeeds.values()].map((feed) => feed.name);
+        const emptyMessage = failedNames.length ? `No live items. Failed feeds: ${failedNames.join(', ')}` : 'No articles found';
+        renderArticleList(colId, [], emptyMessage);
+        updateColumnHealth(colId);
+        updateColumnTimestamp(colId, state.lastFetchAt);
+        return;
+      }
+
+      renderArticleList(colId, merged, '');
+      updateColumnHealth(colId);
+      updateColumnTimestamp(colId, state.lastFetchAt);
+    }
+
+    function scheduleColumnRender(colId) {
+      const state = getColumnState(colId);
+      if (state.renderScheduled) return;
+      state.renderScheduled = true;
+      requestAnimationFrame(() => {
+        state.renderScheduled = false;
+        renderColumn(colId);
+      });
+    }
+
+    function parseFeedItemsFromText(text, feed) {
+      return parseRssXml(text, feed);
+    }
+
+    async function fetchDirectFeed(feed, sourceUrl) {
+      const response = await fetchWithTimeout(`${sourceUrl}${sourceUrl.includes('?') ? '&' : '?'}_cb=${Date.now()}`, { mode: 'cors' });
+      if (!response.ok) throw new Error(`direct fetch failed for ${feed.name}`);
+      const text = await response.text();
+      const items = parseFeedItemsFromText(text, feed);
+      if (!items.length) throw new Error(`empty feed for ${feed.name}`);
+      return items;
+    }
+
+    async function fetchRss2JsonFeed(feed, sourceUrl) {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(sourceUrl)}&count=${feed.maxItems || 20}`;
+      const response = await fetchWithTimeout(apiUrl, { mode: 'cors' });
+      if (!response.ok) throw new Error(`rss2json response failed for ${feed.name}`);
+      const json = await response.json();
+      const items = parseRss2Json(json, feed);
+      if (!items.length) throw new Error(`empty rss2json feed for ${feed.name}`);
+      return items;
+    }
+
+    async function fetchProxyFeed(feed, sourceUrl) {
+      const proxies = buildProxyUrls(sourceUrl);
+      let lastError = null;
+      for (const proxyUrl of proxies) {
+        try {
+          const response = await fetchWithTimeout(proxyUrl, { mode: 'cors' });
+          if (!response.ok) continue;
+          const text = await response.text();
+          let xmlText = text;
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed.contents) xmlText = parsed.contents;
+          } catch {
+            xmlText = text;
+          }
+          const items = parseFeedItemsFromText(xmlText, feed);
+          if (items.length) return items;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      throw lastError || new Error(`proxy failed for ${feed.name}`);
+    }
+
+    function createRaceAttempt(factory) {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), CONFIG.feedTimeoutMs);
+      const promise = Promise.resolve().then(() => factory(controller.signal)).finally(() => clearTimeout(timeoutId));
+      return {
+        promise,
+        abort() {
+          try {
+            controller.abort();
+          } catch {
+            return;
+          }
+        }
+      };
+    }
+
+    async function raceDirectAndJson(feed, sourceUrl) {
+      return new Promise((resolve, reject) => {
+        let settled = false;
+        let directAttempt = null;
+        let jsonAttempt = null;
+        let directError = null;
+        let jsonError = null;
+
+        const finishSuccess = (method, items) => {
+          if (settled) return;
+          settled = true;
+          if (directAttempt) directAttempt.abort();
+          if (jsonAttempt) jsonAttempt.abort();
+          resolve({ items, method, sourceUrl });
+        };
+
+        const finishError = (method, error) => {
+          if (settled) return;
+          if (method === 'direct') directError = error;
+          else jsonError = error;
+          if (directError && jsonError) {
+            settled = true;
+            reject(directError);
+          }
+        };
+
+        directAttempt = createRaceAttempt((signal) => fetchWithTimeout(`${sourceUrl}${sourceUrl.includes('?') ? '&' : '?'}_cb=${Date.now()}`, { mode: 'cors', signal }).then(async (response) => {
+          if (!response.ok) throw new Error(`direct fetch failed for ${feed.name}`);
+          const text = await response.text();
+          const items = parseFeedItemsFromText(text, feed);
+          if (!items.length) throw new Error(`empty feed for ${feed.name}`);
+          return items;
+        }));
+        directAttempt.promise.then((items) => finishSuccess('direct', items)).catch((error) => finishError('direct', error));
+
+        window.setTimeout(() => {
+          if (settled) return;
+          jsonAttempt = createRaceAttempt((signal) => fetchWithTimeout(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(sourceUrl)}&count=${feed.maxItems || 20}`, { mode: 'cors', signal }).then(async (response) => {
+            if (!response.ok) throw new Error(`rss2json response failed for ${feed.name}`);
+            const json = await response.json();
+            const items = parseRss2Json(json, feed);
+            if (!items.length) throw new Error(`empty rss2json feed for ${feed.name}`);
+            return items;
+          }));
+          jsonAttempt.promise.then((items) => finishSuccess('rss2json', items)).catch((error) => finishError('rss2json', error));
+        }, CONFIG.rss2jsonDelayMs);
+      });
+    }
+
+    async function fetchFeedSmart(feed) {
+      const stats = readFeedStats(feed.key);
+      const sources = feedSourceList(feed);
+      let lastError = null;
+
+      const preferredMethod =
+        stats.preferredMethod ||
+        (feed.strategy === 'rss2json' ? 'rss2json' : feed.strategy === 'direct' ? 'direct' : 'race');
+
+      const methodOrder = preferredMethod === 'rss2json'
+        ? ['rss2json', 'direct', 'proxy']
+        : preferredMethod === 'direct'
+          ? ['direct', 'rss2json', 'proxy']
+          : ['race', 'direct', 'rss2json', 'proxy'];
+
+      for (const sourceUrl of sources) {
+        for (const method of methodOrder) {
+          const startedAt = performance.now();
+          try {
+            let result;
+            if (method === 'race') {
+              result = await raceDirectAndJson(feed, sourceUrl);
+            } else if (method === 'rss2json') {
+              result = { items: await fetchRss2JsonFeed(feed, sourceUrl), method: 'rss2json', sourceUrl };
+            } else if (method === 'direct') {
+              result = { items: await fetchDirectFeed(feed, sourceUrl), method: 'direct', sourceUrl };
+            } else {
+              result = { items: await fetchProxyFeed(feed, sourceUrl), method: 'proxy', sourceUrl };
+            }
+
+            const elapsed = Math.round(performance.now() - startedAt);
+            if (result.method !== 'proxy') {
+              updateFeedStats(feed.key, {
+                preferredMethod: result.method,
+                preferredSource: result.sourceUrl,
+                lastSuccessAt: Date.now(),
+                lastDurationMs: elapsed
+              });
+            }
+            return { ...result, elapsed };
+          } catch (error) {
+            lastError = error;
+          }
+        }
+      }
+
+      throw lastError || new Error(`Unable to load ${feed.name}`);
+    }
+
+    async function refreshFeedIntoColumn(column, feed, { retry = false } = {}) {
+      const state = getColumnState(column.id);
+      state.pendingFeeds.add(feed.key);
+      state.failedFeeds.delete(feed.key);
+      updateColumnHealth(column.id);
 
       try {
-        const results = await Promise.all(MARKET_SYMBOLS.map(fetchOneSymbol));
-        const hasData = results.some(r => r.price != null);
-        if (!hasData) { renderMarketFallback(); return; }
-        renderMarketTilesFromResults(results);
-        updateMarketTimestamp();
-        calculateLayout();
-      } catch (e) {
-        renderMarketFallback();
+        const result = await fetchFeedSmart(feed);
+        state.articlesByFeed.set(feed.key, result.items.slice(0, feed.maxItems || 12));
+        state.lastFetchAt = Date.now();
+        state.hasCache = true;
+        writeFeedCache(feed.key, {
+          items: result.items.slice(0, feed.maxItems || 12),
+          method: result.method,
+          sourceUrl: result.sourceUrl,
+          feedName: feed.name
+        });
+        scheduleColumnRender(column.id);
+      } catch (error) {
+        const cached = readFeedCache(feed.key);
+        if (cached?.items?.length && !state.articlesByFeed.has(feed.key)) {
+          state.articlesByFeed.set(feed.key, cached.items);
+        }
+        state.failedFeeds.set(feed.key, feed);
+        console.warn(`Feed failed: ${feed.name}`, error);
+        scheduleColumnRender(column.id);
+      } finally {
+        state.pendingFeeds.delete(feed.key);
+        updateColumnHealth(column.id);
+      }
+
+      if (!retry && state.failedFeeds.size && !state.retryQueued) {
+        state.retryQueued = true;
+        window.setTimeout(() => {
+          state.retryQueued = false;
+          const stillFailed = [...state.failedFeeds.values()];
+          stillFailed.forEach((failedFeed) => {
+            refreshFeedIntoColumn(column, failedFeed, { retry: true });
+          });
+        }, CONFIG.rss2jsonDelayMs + 1200);
       }
     }
 
-    function renderMarketTilesFromResults(results) {
+    function hydrateColumnFromCache(column) {
+      const state = getColumnState(column.id);
+      state.articlesByFeed.clear();
+      let cachedCount = 0;
+      for (const feed of column.feeds) {
+        const cache = readFeedCache(feed.key);
+        if (cache?.items?.length) {
+          state.articlesByFeed.set(feed.key, cache.items);
+          cachedCount += 1;
+          state.lastFetchAt = Math.max(state.lastFetchAt, cache.updatedAt || 0);
+        }
+      }
+      state.hasCache = cachedCount > 0;
+      if (cachedCount) {
+        scheduleColumnRender(column.id);
+      }
+    }
+
+    async function refreshColumn(columnId, options = {}) {
+      const column = getColumn(columnId);
+      if (!column) return;
+      const state = getColumnState(columnId);
+      state.pendingFeeds = new Set(column.feeds.map((feed) => feed.key));
+      state.failedFeeds.clear();
+      state.lastSignature = '';
+      updateColumnHealth(columnId);
+
+      const tasks = column.feeds.map((feed) => refreshFeedIntoColumn(column, feed, options));
+      await Promise.allSettled(tasks);
+      state.pendingFeeds.clear();
+      updateColumnHealth(columnId);
+      scheduleColumnRender(columnId);
+    }
+
+    function marketCacheRead() {
+      return loadJson(STORAGE_KEYS.marketCache, null);
+    }
+
+    function marketCacheWrite(payload) {
+      saveJson(STORAGE_KEYS.marketCache, payload);
+    }
+
+    function renderMarketTimestamp(timestamp) {
+      const el = document.getElementById('market-updated');
+      if (!el) return;
+      el.textContent = `Updated ${new Date(timestamp || Date.now()).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    function renderMarketTiles(results) {
       const container = document.getElementById('market-tiles');
       if (!container) return;
-      container.innerHTML = '';
-      results.forEach(r => {
-        const isGain = r.change == null ? true : r.change >= 0;
-        const color = isGain ? '#16a34a' : '#dc2626';
-        const arrow = isGain ? '▲' : '▼';
-        const priceStr = r.price != null ? r.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
-        const changeStr = r.change != null ? (isGain ? '+' : '') + r.change.toFixed(2) : '—';
-        const pctStr = r.pct != null ? (isGain ? '+' : '') + r.pct.toFixed(2) + '%' : '—';
+      const fragment = document.createDocumentFragment();
+      results.forEach((result) => {
+        const gain = result.change == null ? true : result.change >= 0;
+        const color = gain ? '#16a34a' : '#dc2626';
+        const arrow = gain ? '▲' : '▼';
+        const priceText = result.price != null ? result.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—';
+        const changeText = result.change != null ? `${gain ? '+' : ''}${result.change.toFixed(2)}` : '—';
+        const pctText = result.pct != null ? `${gain ? '+' : ''}${result.pct.toFixed(2)}%` : '—';
+
         const tile = document.createElement('a');
-        tile.href = r.url;
+        tile.href = result.url;
         tile.target = '_blank';
         tile.rel = 'noopener noreferrer';
         tile.className = 'market-tile';
         tile.innerHTML = `
           <div class="tile-link-icon">↗</div>
-          <div class="tile-name">${r.name}</div>
-          <div class="tile-price">${priceStr}</div>
-          <div class="tile-change" style="color:${color}">${arrow} ${changeStr} (${pctStr})</div>
+          <div class="tile-name">${result.name}</div>
+          <div class="tile-price">${priceText}</div>
+          <div class="tile-change" style="color:${color}">${arrow} ${changeText} (${pctText})</div>
         `;
-        container.appendChild(tile);
+        fragment.appendChild(tile);
       });
+      container.replaceChildren(fragment);
     }
 
-    function renderMarketFallback() {
+    function renderMarketFallback(message) {
+      const container = document.getElementById('market-tiles');
+      if (!container || container.childElementCount) return;
+      container.innerHTML = `<div style="font-size:11px;color:#6b7280;padding:8px;">${message || 'Market data unavailable - retrying...'}</div>`;
+    }
+
+    async function fetchOneMarket(symbol) {
+      const apiUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol.sym)}?interval=1d&range=1d`;
+      const proxies = [
+        `https://corsproxy.io/?url=${encodeURIComponent(apiUrl)}`,
+        `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`
+      ];
+      for (const url of proxies) {
+        try {
+          const response = await fetchWithTimeout(url, { mode: 'cors' });
+          if (!response.ok) continue;
+          const text = await response.text();
+          let json;
+          try {
+            const parsed = JSON.parse(text);
+            json = parsed.contents ? JSON.parse(parsed.contents) : parsed;
+          } catch {
+            continue;
+          }
+          const meta = json?.chart?.result?.[0]?.meta;
+          if (!meta) continue;
+          const price = meta.regularMarketPrice;
+          const previousClose = meta.chartPreviousClose || meta.previousClose || meta.regularMarketPreviousClose;
+          const change = (price != null && previousClose != null) ? price - previousClose : null;
+          const pct = (change != null && previousClose) ? (change / previousClose) * 100 : null;
+          return { sym: symbol.sym, name: symbol.name, url: symbol.url, price, change, pct };
+        } catch {
+          continue;
+        }
+      }
+      return { sym: symbol.sym, name: symbol.name, url: symbol.url, price: null, change: null, pct: null };
+    }
+
+    async function refreshMarketData({ background = false } = {}) {
+      const cached = marketCacheRead();
       const container = document.getElementById('market-tiles');
       if (!container) return;
-      container.innerHTML = '<div style="font-size:11px;color:#6b7280;padding:8px;">Market data unavailable — retrying…</div>';
-    }
 
-    function updateMarketTimestamp() {
-      const el = document.getElementById('market-updated');
-      if (el) {
-        const now = new Date();
-        el.textContent = 'Updated ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+      if (!navigator.onLine && cached?.results?.length) {
+        renderMarketTiles(cached.results);
+        renderMarketTimestamp(cached.updatedAt);
+        return;
+      }
+      if (!navigator.onLine && !cached?.results?.length) {
+        renderMarketFallback('Market data unavailable - offline.');
+        return;
+      }
+
+      const results = await Promise.all(MARKET_SYMBOLS.map(fetchOneMarket));
+      const hasData = results.some((result) => result.price != null);
+      if (hasData) {
+        marketCacheWrite({ updatedAt: Date.now(), results });
+        renderMarketTiles(results);
+        renderMarketTimestamp(Date.now());
+        scheduleLayout();
+      } else if (cached?.results?.length) {
+        renderMarketTiles(cached.results);
+        renderMarketTimestamp(cached.updatedAt);
+      } else {
+        renderMarketFallback();
       }
     }
 
-    // ── RSS FEEDS — Direct XML fetch with multi-proxy fallback ──
-
-    function parseXMLItems(xmlText, sourceName) {
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(xmlText, 'text/xml');
-
-      const rssItems = [...xml.querySelectorAll('item')];
-      if (rssItems.length > 0) {
-        return rssItems.map(item => {
-          const pubDate = item.querySelector('pubDate')?.textContent?.trim() ||
-                          item.querySelector('published')?.textContent?.trim() ||
-                          item.querySelector('updated')?.textContent?.trim() ||
-                          item.querySelector('dc\\:date, date')?.textContent?.trim() ||
-                          '';
-          return {
-            title: item.querySelector('title')?.textContent || '',
-            link: item.querySelector('link')?.textContent || '',
-            pubDate: pubDate,
-            description: item.querySelector('description')?.textContent || '',
-            source: sourceName
-          };
-        });
-      }
-
-      const atomEntries = [...xml.querySelectorAll('entry')];
-      if (atomEntries.length > 0) {
-        return atomEntries.map(entry => {
-          const title = entry.querySelector('title')?.textContent || '';
-          let link = '';
-          const altLink = entry.querySelector('link[rel="alternate"]');
-          if (altLink) {
-            link = altLink.getAttribute('href') || '';
-          } else {
-            const anyLink = entry.querySelector('link');
-            if (anyLink) {
-              link = anyLink.getAttribute('href') || anyLink.textContent || '';
-            }
-          }
-          if (!link) {
-            link = entry.querySelector('id')?.textContent || '';
-          }
-          const pubDate = entry.querySelector('published')?.textContent?.trim() ||
-                          entry.querySelector('updated')?.textContent?.trim() ||
-                          entry.querySelector('pubDate')?.textContent?.trim() ||
-                          '';
-          const mediaDesc = entry.getElementsByTagNameNS('http://search.yahoo.com/mrss/', 'description');
-          let description = '';
-          if (mediaDesc.length > 0) {
-            description = mediaDesc[0].textContent || '';
-          } else {
-            description = entry.querySelector('content')?.textContent ||
-                          entry.querySelector('summary')?.textContent || '';
-          }
-          return { title, link, pubDate, description, source: sourceName };
-        });
-      }
-
-      return [];
-    }
-
-    async function fetchSingleFeed(feedUrl, sourceName) {
-      const bust = '&_cb=' + Date.now(); // cache-buster
-      const proxies = [
-        `https://corsproxy.io/?url=${encodeURIComponent(feedUrl + (feedUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now())}`,
-        `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}${bust}`
-      ];
-
-      for (const proxyUrl of proxies) {
-        try {
-          const res = await fetch(proxyUrl, { cache: 'no-store' });
-          if (!res.ok) continue;
-          const text = await res.text();
-          // allorigins wraps in { contents: "..." }
-          let xmlText = text;
-          try {
-            const outer = JSON.parse(text);
-            if (outer.contents) xmlText = outer.contents;
-          } catch { /* raw XML, use as-is */ }
-
-          const items = parseXMLItems(xmlText, sourceName);
-          if (items.length > 0) {
-            console.log(`✓ ${sourceName}: ${items.length} items via ${proxyUrl.includes('allorigins') ? 'allorigins' : 'corsproxy'}`);
-            return items;
-          }
-        } catch (e) {
-          console.warn(`Proxy failed for ${sourceName}:`, e.message);
-        }
-      }
-      console.warn(`All proxies failed for ${sourceName}`);
-      return [];
-    }
-
-    // ── rss2json FAST FETCH (for News/Markets/AI columns) ──
-    async function fetchSingleFeedFast(feedUrl, sourceName) {
-      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=25`;
-      try {
-        const res = await fetch(apiUrl, { cache: 'no-store' });
-        if (!res.ok) throw new Error('rss2json failed');
-        const json = await res.json();
-        if (json.status !== 'ok' || !json.items?.length) throw new Error('empty');
-        return json.items.map(item => ({
-          title: item.title || '',
-          link: item.link || '',
-          pubDate: item.pubDate || '',
-          description: item.description || item.content || '',
-          source: sourceName
-        }));
-      } catch (e) {
-        // fall back to direct XML
-        return fetchSingleFeed(feedUrl, sourceName);
-      }
-    }
-
-    // ── RENDERING ──
-    function skeletonHTML() {
-      let h = '';
-      for (let i = 0; i < 4; i++) {
-        h += `<div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line long"></div><div class="skeleton-line medium"></div></div>`;
-      }
-      return h;
-    }
-
-    function articleListHTML(articles, maxItems, emptyMessage) {
-      if (!articles || articles.length === 0) {
-        const msg = emptyMessage || 'No articles found';
-        return `<div class="feed-error"><span>${msg}</span></div>`;
-      }
-      let h = '';
-      articles.slice(0, maxItems || 40).forEach(item => {
-        const title = stripHTML(item.title);
-        const desc = stripHTML(item.description);
-        const ago = timeAgo(item.pubDate);
-        const recent = isRecent(item.pubDate);
-        const color = BADGE_COLORS[item.source] || '#6b7280';
-        h += `<a class="article-card" href="${item.link}" target="_blank" rel="noopener noreferrer">
-          <div class="article-top">
-            <span class="source-badge" style="background:${color}">${item.source}</span>
-            <span class="time-ago">${recent ? '<span class="recent-dot"></span>' : ''}${ago}</span>
-          </div>
-          <div class="article-title">${title}</div>
-          ${desc ? `<div class="article-desc">${desc}</div>` : ''}
-        </a>`;
-      });
-      return h;
-    }
-
-    function sortByDate(articles) {
-      return articles.sort((a, b) => {
-        const da = new Date(a.pubDate).getTime() || 0;
-        const db = new Date(b.pubDate).getTime() || 0;
-        return db - da;
-      });
-    }
-
-    async function fetchAllFeedsForColumn(colId) {
-      const col = COLUMNS.find(c => c.id === colId);
-      if (!col) return;
-      const listEl = document.getElementById(`articles-${colId}`);
-      if (!listEl) return;
-
-      listEl.innerHTML = skeletonHTML();
-      let merged = [];
-
-      // Medical Education uses direct XML (freshness critical); all others use rss2json (fast)
-      const useFast = true;
-      const fetchFn = useFast ? fetchSingleFeedFast : fetchSingleFeed;
-
-      const promises = col.feeds.map(feed => fetchFn(feed.url, feed.name));
-      const results = await Promise.allSettled(promises);
-
-      results.forEach(result => {
-        if (result.status === 'fulfilled' && result.value.length > 0) {
-          merged = merged.concat(result.value);
-        }
-      });
-
-      merged = sortByDate(merged);
-
-      if (FILTERED_COLUMNS.has(colId)) {
-        merged = filterByAge(merged);
-      }
-
-      columnState[colId].mergedArticles = merged;
-      columnState[colId].lastFetch = Date.now();
-
-      const emptyMsg = FILTERED_COLUMNS.has(colId) ? 'No articles in the past 36 hours' : 'No articles found';
-      listEl.innerHTML = articleListHTML(merged, 40, emptyMsg);
-      updateColTimestamp(colId);
-    }
-
-    function updateColTimestamp(colId) {
-      const el = document.getElementById(`col-time-${colId}`);
-      if (el) el.textContent = nowTimestamp();
-    }
-
-    // ── LAYOUT CALCULATION ──
-    function calculateLayout() {
-      const marketSection = document.getElementById('market-section-w2x3');
-      const quickLinksBar = document.getElementById('quick-links-bar-q1r2');
-      const cols = document.getElementById('columns-container-c4d5');
-
-      const headerH = 40;
-      const marketH = (marketSection && marketSection.offsetHeight > 20) ? marketSection.offsetHeight : 74;
-      const quickLinksH = quickLinksBar ? quickLinksBar.offsetHeight : 34;
-
-      if (quickLinksBar) {
-        quickLinksBar.style.top = (headerH + marketH) + 'px';
-      }
-
-      cols.style.top = (headerH + marketH + quickLinksH) + 'px';
-    }
-
-    // ── RENDER COLUMNS ──
     function renderColumns() {
       const container = document.getElementById('columns-container-c4d5');
+      if (!container) return;
       container.innerHTML = '';
-      COLUMNS.forEach(col => {
-        const div = document.createElement('div');
-        div.className = 'column';
-        div.id = `column-${col.id}`;
 
-        const showFilterPill = FILTERED_COLUMNS.has(col.id);
-
-        div.innerHTML = `
-          <div class="col-header" data-collapse="${col.id}">
+      COLUMNS.forEach((column) => {
+        const columnNode = document.createElement('div');
+        columnNode.className = 'column';
+        columnNode.id = `column-${column.id}`;
+        const filterPill = column.id === 'news' || column.id === 'markets' ? '<span class="filter-pill">36h</span>' : '';
+        columnNode.innerHTML = `
+          <div class="col-header" data-collapse="${column.id}">
             <div class="flex items-center gap-2">
-              <span class="col-title">${col.label}</span>
+              <span class="col-title">${column.label}</span>
               <span class="collapse-icon font-mono-data" style="font-size:9px;color:#9ca3af;">▼</span>
             </div>
-            <div class="col-meta" data-refresh-col="${col.id}">
+            <div class="col-meta" data-refresh-col="${column.id}">
               <span>↺</span>
-              <span id="col-time-${col.id}" style="font-variant-numeric:tabular-nums;">${nowTimestamp()}</span>
-              ${showFilterPill ? '<span class="filter-pill">36h</span>' : ''}
+              <span id="col-time-${column.id}" style="font-variant-numeric:tabular-nums;">${nowTimestamp()}</span>
+              <span id="col-health-${column.id}" class="feed-health ok">0/${column.feeds.length}</span>
+              ${filterPill}
             </div>
           </div>
-          <div class="article-list" id="articles-${col.id}">${skeletonHTML()}</div>
+          <div class="article-list" id="articles-${column.id}">${skeletonHTML()}</div>
         `;
-        container.appendChild(div);
+        container.appendChild(columnNode);
       });
 
-      document.querySelectorAll('[data-collapse]').forEach(el => {
-        el.addEventListener('click', function(e) {
+      document.querySelectorAll('[data-collapse]').forEach((element) => {
+        element.addEventListener('click', (event) => {
           if (window.innerWidth >= 768) return;
-          if (e.target.closest('[data-refresh-col]')) return;
-          const colId = this.dataset.collapse;
-          const colEl = document.getElementById(`column-${colId}`);
-          if (colEl) {
-            colEl.classList.toggle('collapsed');
-            const icon = this.querySelector('.collapse-icon');
-            if (icon) icon.textContent = colEl.classList.contains('collapsed') ? '▶' : '▼';
-          }
+          if (event.target.closest('[data-refresh-col]')) return;
+          const colId = element.dataset.collapse;
+          const colNode = document.getElementById(`column-${colId}`);
+          if (!colNode) return;
+          colNode.classList.toggle('collapsed');
+          const icon = element.querySelector('.collapse-icon');
+          if (icon) icon.textContent = colNode.classList.contains('collapsed') ? '▶' : '▼';
         });
       });
 
-      document.querySelectorAll('[data-refresh-col]').forEach(el => {
-        el.addEventListener('click', function(e) {
-          e.stopPropagation();
-          fetchAllFeedsForColumn(this.dataset.refreshCol);
+      document.querySelectorAll('[data-refresh-col]').forEach((element) => {
+        element.addEventListener('click', (event) => {
+          event.stopPropagation();
+          refreshColumn(element.dataset.refreshCol, { force: true });
         });
       });
     }
 
-    // ── SETTINGS ──
+    function hydrateAllColumnsFromCache() {
+      COLUMNS.forEach((column) => hydrateColumnFromCache(column));
+    }
+
+    function calculateLayout() {
+      const headerEl = document.getElementById('header-bar-a1b2');
+      const marketEl = document.getElementById('market-section-w2x3');
+      const quickLinksEl = document.getElementById('quick-links-bar-q1r2');
+      const columnsEl = document.getElementById('columns-container-c4d5');
+      const headerHeight = headerEl?.offsetHeight || 40;
+      const marketHeight = marketEl?.offsetHeight || 74;
+      const quickLinksHeight = quickLinksEl?.offsetHeight || 34;
+      if (quickLinksEl) quickLinksEl.style.top = `${headerHeight + marketHeight}px`;
+      if (columnsEl) columnsEl.style.top = `${headerHeight + marketHeight + quickLinksHeight}px`;
+    }
+
+    let layoutFrame = 0;
+    function scheduleLayout() {
+      if (layoutFrame) return;
+      layoutFrame = requestAnimationFrame(() => {
+        layoutFrame = 0;
+        calculateLayout();
+      });
+    }
+
+    function startClock() {
+      const updateClock = () => {
+        const now = new Date();
+        const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const el = document.getElementById('header-clock-c3d4');
+        if (!el) return;
+        el.textContent = `${days[now.getDay()]} ${String(now.getDate()).padStart(2, '0')} ${months[now.getMonth()]} ${now.getFullYear()}  ${now.toLocaleTimeString('en-US', { hour12: false })} CDT`;
+      };
+      updateClock();
+      window.setInterval(updateClock, 1000);
+    }
+
     function openSettings() {
-      document.getElementById('select-rss-i6j7').value = localStorage.getItem('rssInterval') || '15';
-      document.getElementById('select-mkt-q4r5').value = localStorage.getItem('mktInterval') || '2';
+      document.getElementById('select-rss-i6j7').value = localStorage.getItem(STORAGE_KEYS.rssInterval) || '15';
+      document.getElementById('select-mkt-q4r5').value = localStorage.getItem(STORAGE_KEYS.marketInterval) || '2';
       document.getElementById('settings-modal-g8h9').classList.add('show');
     }
 
@@ -1114,55 +1616,91 @@
     }
 
     function saveSettings() {
-      localStorage.setItem('rssInterval', document.getElementById('select-rss-i6j7').value);
-      localStorage.setItem('mktInterval', document.getElementById('select-mkt-q4r5').value);
+      localStorage.setItem(STORAGE_KEYS.rssInterval, document.getElementById('select-rss-i6j7').value);
+      localStorage.setItem(STORAGE_KEYS.marketInterval, document.getElementById('select-mkt-q4r5').value);
       closeSettings();
-      startRefreshTimers();
+      restartTimers();
     }
 
-    function refreshAll() {
-      fetchMarketData();
-      COLUMNS.forEach(col => fetchAllFeedsForColumn(col.id));
+    async function refreshAll({ force = true } = {}) {
+      await Promise.all([
+        refreshMarketData({ background: true }),
+        ...COLUMNS.map((column) => refreshColumn(column.id, { force }))
+      ]);
     }
 
-    // ── REFRESH TIMERS ──
-    let rssTimer;
-    function startRefreshTimers() {
-      if (rssTimer) clearInterval(rssTimer);
-      rssTimer = setInterval(() => {
-        COLUMNS.forEach(col => fetchAllFeedsForColumn(col.id));
-      }, CONFIG.rssRefresh);
+    let rssTimer = 0;
+    let marketTimer = 0;
+
+    function clearTimers() {
+      if (rssTimer) clearTimeout(rssTimer);
+      if (marketTimer) clearTimeout(marketTimer);
+      rssTimer = 0;
+      marketTimer = 0;
     }
 
-    // ── INIT ──
-    function init() {
+    function scheduleRssRefresh() {
+      if (rssTimer) clearTimeout(rssTimer);
+      const intervalMs = (parseInt(localStorage.getItem(STORAGE_KEYS.rssInterval), 10) || 15) * 60 * 1000;
+      rssTimer = window.setTimeout(async () => {
+        await Promise.all(COLUMNS.map((column) => refreshColumn(column.id, { force: true })));
+        scheduleRssRefresh();
+      }, intervalMs);
+    }
+
+    function scheduleMarketRefresh() {
+      if (marketTimer) clearTimeout(marketTimer);
+      const intervalMs = (parseInt(localStorage.getItem(STORAGE_KEYS.marketInterval), 10) || 2) * 60 * 1000;
+      marketTimer = window.setTimeout(async () => {
+        await refreshMarketData({ background: true });
+        scheduleMarketRefresh();
+      }, intervalMs);
+    }
+
+    function restartTimers() {
+      clearTimers();
+      scheduleRssRefresh();
+      scheduleMarketRefresh();
+    }
+
+    function wireLayoutObservers() {
+      const targets = ['market-section-w2x3', 'quick-links-bar-q1r2'];
+      if (typeof ResizeObserver === 'function') {
+        const observer = new ResizeObserver(() => scheduleLayout());
+        targets.forEach((id) => {
+          const element = document.getElementById(id);
+          if (element) observer.observe(element);
+        });
+      }
+      window.addEventListener('resize', scheduleLayout);
+      window.addEventListener('online', () => refreshAll({ force: true }));
+    }
+
+    async function init() {
       if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
         lucide.createIcons();
       }
 
       document.getElementById('settings-btn-e5f6').addEventListener('click', openSettings);
-      document.getElementById('refresh-btn-g7h8').addEventListener('click', refreshAll);
+      document.getElementById('refresh-btn-g7h8').addEventListener('click', () => refreshAll({ force: true }));
       document.getElementById('save-settings-y2z3').addEventListener('click', saveSettings);
       document.getElementById('cancel-settings-c6d7').addEventListener('click', closeSettings);
-      document.getElementById('settings-modal-g8h9').addEventListener('click', function(e) {
-        if (e.target === this) closeSettings();
+      document.getElementById('settings-modal-g8h9').addEventListener('click', (event) => {
+        if (event.target === event.currentTarget) closeSettings();
       });
 
+      startClock();
       renderColumns();
+      hydrateAllColumnsFromCache();
+      wireLayoutObservers();
+      scheduleLayout();
 
-      // Market data: immediate first load + single interval
-      fetchMarketData();
-      const MARKET_INTERVAL = setInterval(fetchMarketData, 2 * 60 * 1000);
+      await Promise.all([
+        refreshMarketData({ background: true }),
+        ...COLUMNS.map((column) => refreshColumn(column.id, { force: true }))
+      ]);
 
-      COLUMNS.forEach(col => fetchAllFeedsForColumn(col.id));
-
-      requestAnimationFrame(() => {
-        calculateLayout();
-        window.addEventListener('resize', calculateLayout);
-      });
-
-      // Start RSS refresh timers (market interval is handled above — only one)
-      startRefreshTimers();
+      restartTimers();
     }
 
     if (document.readyState === 'loading') {
